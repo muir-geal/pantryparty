@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { ModalController } from '@ionic/angular';
+import { NutritionService } from '../services/nutrition.service';
 
 @Component({
   selector: 'app-open-food-detail-modal',
@@ -13,7 +14,7 @@ export class OpenFoodDetailModalComponent {
 
   isReserved = false;
 
-  constructor(private modalController: ModalController) {}
+  constructor(private modalController: ModalController, private nutritionService: NutritionService) {}
 
 ngOnInit() {
   this.isReserved = !!this.food?.isReserved;
@@ -26,11 +27,15 @@ dismiss() {
   }, 'confirm');
 }
 
-// ionViewWillLeave() {
+extract(nutrient: string, food: any): number {
+  return this.nutritionService.extractNutritionValue(food, nutrient);
+}
 
-// }
+getCalories(food: any): number {
+  return this.nutritionService.getTotalCalories(food);
+}
 
-  reserveFood()
+reserveFood()
   {
   this.isReserved = !this.isReserved;
   }

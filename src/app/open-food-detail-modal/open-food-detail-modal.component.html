@@ -19,23 +19,21 @@
       {{ food.available }} {{ food.unit }} available for sharing
     </p>
     <p *ngIf="food.available == 0">not available for sharing</p>
-    <div
-      *ngIf="
-        food.energykcal ||
-        food.proteins ||
-        food.fats ||
-        food.sugars ||
-        food.salts ||
-        food.carbohydrates
-      "
-      style="border-top: 1px solid #ccc"
-    >
-      <p *ngIf="food.energykcal">{{ food.energykcal }} calories</p>
-      <p *ngIf="food.proteins">proteins: {{ food.proteins }}</p>
-      <p *ngIf="food.fats">fats: {{ food.fats }}</p>
-      <p *ngIf="food.sugars">sugars: {{ food.sugars }}</p>
-      <p *ngIf="food.salts">salts: {{ food.salts }}</p>
-      <p *ngIf="food.carbohydrates">carbohydrates: {{ food.carbohydrates }}</p>
+    <div *ngIf="food.nutriments" style="border-top: 1px solid #ccc">
+      <p *ngIf="getCalories(food) > 0">
+        {{ getCalories(food) }} total calories
+      </p>
+      <p *ngIf="extract('proteins', food)">
+        proteins: {{ extract("proteins", food) }}g
+      </p>
+      <p *ngIf="extract('fats', food)">fats: {{ extract("fats", food) }}g</p>
+      <p *ngIf="extract('sugars', food)">
+        sugars: {{ extract("sugars", food) }}g
+      </p>
+      <p *ngIf="extract('salt', food)">salt: {{ extract("salt", food) }}g</p>
+      <p *ngIf="extract('carbohydrates', food)">
+        carbohydrates: {{ extract("carbohydrates", food) }}g
+      </p>
     </div>
     <div
       *ngIf="countAllergens(food) >= 0"

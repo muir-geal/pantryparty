@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { ModalController } from '@ionic/angular';
 import { NutritionService } from '../services/nutrition.service';
+import { ReservefoodService } from '../services/reserve-food.service';
 
 @Component({
   selector: 'app-open-food-detail-modal',
@@ -14,7 +15,7 @@ export class OpenFoodDetailModalComponent {
 
   isReserved = false;
 
-  constructor(private modalController: ModalController, private nutritionService: NutritionService) {}
+  constructor(private modalController: ModalController, private nutritionService: NutritionService, private reserveFoodService: ReservefoodService) {}
 
 ngOnInit() {
   this.isReserved = !!this.food?.isReserved;
@@ -35,10 +36,26 @@ getCalories(food: any): number {
   return this.nutritionService.getTotalCalories(food);
 }
 
-reserveFood()
-  {
+// reserveFood()
+//   {
+//   this.isReserved = !this.isReserved;
+//   }
+
+  reserveFood() {
+  // Toggle the local state
   this.isReserved = !this.isReserved;
+  
+  // Update the service with the new state
+  const identifier = this.food.barcode || this.food.openfoodfactsid;
+  if (identifier) {
+    this.reserveFoodService.toggleReservation(identifier, this.isReserved);
   }
+  
+  // Also update the food object if you're using it in the template
+  if (this.food) {
+    this.food.isReserved = this.isReserved;
+  }
+}
 
 countAllergens(item: any): number {
   if (!item || !item.allergens) return 0;

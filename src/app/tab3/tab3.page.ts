@@ -39,6 +39,16 @@ export class Tab3Page {
 
   ngOnInit() {
   this.loadPantries();
+
+  // const identifier = this.food?.barcode || this.food?.openfoodfactsid;
+  // if (identifier) {
+  //   this.isReserved = this.reservefoodService.isItemReserved(identifier);
+    
+  //   // Also update the food object
+  //   if (this.food) {
+  //     this.food.isReserved = this.isReserved;
+  //   }
+  // }
   }
 
 async loadPantries() {

@@ -216,6 +216,41 @@ async cancelScan() {
   await this.stopScan();
 }
 
+// async addFoodByBarcode(barcode: string): Promise<any | null> {
+//   const product = await this.firebaseService.fetchProductData(barcode);
+//   if (!product) {
+//     alert('Product not found');
+//     return null;
+//   }
+
+//   const food = {
+//     type: '',
+//     barcode: barcode,
+//     name: product.product_name || 'unknown',
+//     expirationdate: product.expiration_date || '',
+//     amount: this.amount,
+//     available: this.amount,
+//     unit: '',
+//     vegan: product.labels_tags?.includes('en:vegan') || false,
+//     vegetarian: product.labels_tags?.includes('en:vegetarian') || false,
+//     halal: product.labels_tags?.includes('en:halal') || false,
+//     kosher: product.labels_tags?.includes('en:kosher') || false,
+//     opened: false,
+//     allergens: (product.allergens_tags || []).map((a: string) => a.replace('en:', '')),
+//     image: product.image_front_small_url || product.image_url || '',
+//     energykcal: product.nutriments?.['energy-kcal'] || null,
+//     proteins: product.nutriments?.proteins || null,
+//     fats: product.nutriments?.fat || null,
+//     sugars: product.nutriments?.sugars || null,
+//     salts: product.nutriments?.salt || null,
+//     carbohydrates: product.nutriments?.carbohydrates || null,
+//     notes: this.notes,
+//     rating: this.newRating,
+//   };
+
+//   return food;
+// }
+
 async addFoodByBarcode(barcode: string): Promise<any | null> {
   const product = await this.firebaseService.fetchProductData(barcode);
   if (!product) {
@@ -223,29 +258,102 @@ async addFoodByBarcode(barcode: string): Promise<any | null> {
     return null;
   }
 
+  // Create food item with the comprehensive structure matching saveFood()
   const food = {
-    type: '',
-    barcode: barcode,
+    ...this.firebaseService.createFoodItem(), // Start with the default structure
+    
+    // Basic info
     name: product.product_name || 'unknown',
+    type: '', // You might want to determine this from product categories
+    openfoodfactsid: barcode, // Store the barcode as OpenFoodFacts ID
     expirationdate: product.expiration_date || '',
-    amount: this.amount,
-    available: this.amount,
+    amount: this.amount || 1,
+    available: this.amount || 1,
     unit: '',
+    
+    // Dietary flags
     vegan: product.labels_tags?.includes('en:vegan') || false,
     vegetarian: product.labels_tags?.includes('en:vegetarian') || false,
     halal: product.labels_tags?.includes('en:halal') || false,
     kosher: product.labels_tags?.includes('en:kosher') || false,
-    opened: false,
-    allergens: (product.allergens_tags || []).map((a: string) => a.replace('en:', '')),
+    
+    // Other properties
     image: product.image_front_small_url || product.image_url || '',
-    energykcal: product.nutriments?.['energy-kcal'] || null,
-    proteins: product.nutriments?.proteins || null,
-    fats: product.nutriments?.fat || null,
-    sugars: product.nutriments?.sugars || null,
-    salts: product.nutriments?.salt || null,
-    carbohydrates: product.nutriments?.carbohydrates || null,
-    notes: this.notes,
-    rating: this.newRating,
+    allergens: (product.allergens_tags || []).map((a: string) => a.replace('en:', '')),
+    notes: this.notes || '',
+    rating: this.newRating || 0,
+    
+    // Map nutrition data to the new structure
+    nutrition: {
+      fat: product.nutriments?.fat || 0,
+      'saturated-fat': product.nutriments?.['saturated-fat'] || 0,
+      salt: product.nutriments?.salt || 0,
+      sugar: product.nutriments?.sugars || 0
+    },
+    
+    // Map comprehensive nutriments data
+    nutriments: {
+      carbohydrates: product.nutriments?.carbohydrates || 0,
+      carbohydrates_100g: product.nutriments?.carbohydrates_100g || 0,
+      carbohydrates_serving: product.nutriments?.carbohydrates_serving || 0,
+      carbohydrates_unit: 'g',
+      carbohydrates_value: product.nutriments?.carbohydrates || 0,
+      
+      energy: product.nutriments?.energy || 0,
+      'energy-kcal': product.nutriments?.['energy-kcal'] || 0,
+      'energy-kcal_100g': product.nutriments?.['energy-kcal_100g'] || 0,
+      'energy-kcal_serving': product.nutriments?.['energy-kcal_serving'] || 0,
+      'energy-kcal_unit': 'kcal',
+      'energy-kcal_value': product.nutriments?.['energy-kcal'] || 0,
+      'energy-kcal_value_computed': product.nutriments?.['energy-kcal_value_computed'] || 0,
+      energy_100g: product.nutriments?.energy_100g || 0,
+      energy_serving: product.nutriments?.energy_serving || 0,
+      energy_unit: 'kcal',
+      energy_value: product.nutriments?.['energy-kcal'] || 0,
+      
+      fat: product.nutriments?.fat || 0,
+      fat_100g: product.nutriments?.fat_100g || 0,
+      fat_serving: product.nutriments?.fat_serving || 0,
+      fat_unit: 'g',
+      fat_value: product.nutriments?.fat || 0,
+      
+      proteins: product.nutriments?.proteins || 0,
+      proteins_100g: product.nutriments?.proteins_100g || 0,
+      proteins_serving: product.nutriments?.proteins_serving || 0,
+      proteins_unit: 'g',
+      proteins_value: product.nutriments?.proteins || 0,
+      
+      salt: product.nutriments?.salt || 0,
+      salt_100g: product.nutriments?.salt_100g || 0,
+      salt_serving: product.nutriments?.salt_serving || 0,
+      salt_unit: 'g',
+      salt_value: product.nutriments?.salt || 0,
+      
+      'saturated-fat': product.nutriments?.['saturated-fat'] || 0,
+      'saturated-fat_100g': product.nutriments?.['saturated-fat_100g'] || 0,
+      'saturated-fat_serving': product.nutriments?.['saturated-fat_serving'] || 0,
+      'saturated-fat_unit': 'g',
+      'saturated-fat_value': product.nutriments?.['saturated-fat'] || 0,
+      
+      sodium: product.nutriments?.sodium || 0,
+      sodium_100g: product.nutriments?.sodium_100g || 0,
+      sodium_serving: product.nutriments?.sodium_serving || 0,
+      sodium_unit: 'g',
+      sodium_value: product.nutriments?.sodium || 0,
+      
+      sugars: product.nutriments?.sugars || 0,
+      sugars_100g: product.nutriments?.sugars_100g || 0,
+      sugars_serving: product.nutriments?.sugars_serving || 0,
+      sugars_unit: 'g',
+      sugars_value: product.nutriments?.sugars || 0
+    },
+    
+    // Use defaults from createFoodItem for nutriments_estimated
+    nutriments_estimated: this.firebaseService.createFoodItem().nutriments_estimated,
+    
+    // Environmental data (if available from OpenFoodFacts)
+    footprint_per_kg: product.footprint_per_kg || 0,
+    footprint_grade: product.footprint_grade || ''
   };
 
   return food;

@@ -95,25 +95,26 @@
               <p>{{ item.available }} {{ item.unit }} available for sharing</p>
 
               <div
-                *ngIf="item.energykcal || item.proteins || item.fats || item.sugars || item.salts || item.carbohydrates"
+                *ngIf="item.nutriments"
                 style="border-top: 1px solid #ccc; padding-top: 16px"
               >
-                <p *ngIf="item.energykcal">
-                  {{ (item.energykcal * item.amount / 100) | number:'1.0-0' }}
-                  calories left
+                <p *ngIf="item.nutriments?.['energy-kcal']">
+                  {{ item.nutriments['energy-kcal'] }} calories/100g
                 </p>
-                <p *ngIf="item.energykcal">
-                  {{ item.energykcal }} total calories
+                <p *ngIf="item.nutriments?.proteins">
+                  proteins: {{ item.nutriments.proteins }}g/100g
                 </p>
-                <p *ngIf="item.energykcal">
-                  {{ item.energykcal }} calories/100{{item.unit}}
+                <p *ngIf="item.nutriments?.fat">
+                  fats: {{ item.nutriments.fat }}g/100g
                 </p>
-                <p *ngIf="item.proteins">proteins: {{ item.proteins }}</p>
-                <p *ngIf="item.fats">fats: {{ item.fats }}</p>
-                <p *ngIf="item.sugars">sugars: {{ item.sugars }}</p>
-                <p *ngIf="item.salts">salts: {{ item.salts }}</p>
-                <p *ngIf="item.carbohydrates">
-                  carbohydrates: {{ item.carbohydrates }}
+                <p *ngIf="item.nutriments?.sugars">
+                  sugars: {{ item.nutriments.sugars }}g/100g
+                </p>
+                <p *ngIf="item.nutriments?.salt">
+                  salt: {{ item.nutriments.salt }}g/100g
+                </p>
+                <p *ngIf="item.nutriments?.carbohydrates">
+                  carbohydrates: {{ item.nutriments.carbohydrates }}g/100g
                 </p>
               </div>
 

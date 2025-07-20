@@ -61,7 +61,7 @@
             <ion-label>
               {{ food.name }} ({{ food.amount }} {{ food.unit }})
               <p *ngIf="getCalories(food) && food.unit == 'pcs'">
-                {{ getCalories(food) }} calories
+                {{ getCalories(food) }} calories / 100g
               </p>
               <p *ngIf="getCalories(food) && food.unit != 'pcs'">
                 {{ (getCalories(food) * food.amount / 100) | number:'1.0-0' }}

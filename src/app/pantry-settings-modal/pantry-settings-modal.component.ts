@@ -28,7 +28,7 @@ export class PantrySettingsModalComponent  implements OnInit {
     this.editNick = this.currentNick;
   }
 
-    dismiss() {
+  dismiss() {
     this.modalController.dismiss();
   }
 
@@ -42,7 +42,6 @@ export class PantrySettingsModalComponent  implements OnInit {
     this.editNick = this.currentNick;
     this.isEditing = false;
   }
-
 
   async saveChanges() {
     if (!this.editName.trim() || !this.editNick.trim()) {
@@ -114,9 +113,9 @@ async deletePantry() {
     await alert.present();
   }
 
-async deleteMyPantry() {
-    await this.modalController.dismiss({
-      action: 'delete'
-    });
-  }
+// async deleteMyPantry() {
+//     await this.modalController.dismiss({
+//       action: 'delete'
+//     });
+//   }
 }

@@ -20,9 +20,11 @@
     </p>
     <p *ngIf="food.available == 0">not available for sharing</p>
     <div *ngIf="food.nutriments" style="border-top: 1px solid #ccc">
-      <p *ngIf="getCalories(food) > 0">
-        {{ getCalories(food) }} total calories
+      <p *ngIf="getCalories(food) && food.unit != 'pcs'">
+        {{ (getCalories(food) * food.amount) / 100 | number : "1.0-0" }}
+        calories left
       </p>
+      <p *ngIf="getCalories(food)">{{ getCalories(food) }} total calories</p>
       <p *ngIf="extract('proteins', food)">
         proteins: {{ extract("proteins", food) }}g
       </p>

@@ -3,6 +3,7 @@ import { FirebaseService } from '../services/firebase.service';
 import { ModalController } from '@ionic/angular';
 import { OpenFoodDetailModalComponent } from '../open-food-detail-modal/open-food-detail-modal.component';
 import { ReservefoodService } from '../services/reserve-food.service';
+import { NutritionService } from '../services/nutrition.service';
 
 @Component({
   selector: 'app-tab3',
@@ -28,7 +29,7 @@ export class Tab3Page {
   name:string = '';
   nick:string = '';
 
-  constructor(private firebaseService: FirebaseService, private modalController: ModalController, private reservefoodService: ReservefoodService) {}
+  constructor(private firebaseService: FirebaseService, private modalController: ModalController, private reservefoodService: ReservefoodService, private nutritionService: NutritionService) {}
 
   searchTerm: string = '';
   allPantries: any[] = [];
@@ -214,7 +215,7 @@ for (const pantry of this.filteredPantries) {
     });
   }
 
-    sortPantries(pantries: any[]) {
+  sortPantries(pantries: any[]) {
     if (!pantries || pantries.length === 0) return [];
     
     return [...pantries].sort((a, b) => {
@@ -222,12 +223,12 @@ for (const pantry of this.filteredPantries) {
     });
   }
 
-    onSortOptionChange(event: any) {
+  onSortOptionChange(event: any) {
     this.sortOption = event.detail.value;
     this.updateFilteredPantries(); // Update the filtered pantries when sort changes
   }
 
-updateFilteredPantries() {
+  updateFilteredPantries() {
   if (!this.searchTerm.trim()) {
     this.filteredPantries = this.sortPantries(this.allPantries).map(pantry => ({
       ...pantry,
@@ -258,13 +259,16 @@ updateFilteredPantries() {
   }
 }
 
+getCalories(food: any): number {
+  return this.nutritionService.getTotalCalories(food);
+}
 
-countAllergens(item: any): number {
+  countAllergens(item: any): number {
   if (!item || !item.allergens) return 0;
   return item.allergens.length;
 }
 
-getAllergenString(item: any): string {
+  getAllergenString(item: any): string {
   if (!item || !item.allergens || item.allergens.length === 0) {
     return '';
   }

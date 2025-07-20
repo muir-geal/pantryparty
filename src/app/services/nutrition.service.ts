@@ -47,7 +47,7 @@ export class NutritionService {
   const nutrition = food.nutrition || {};
   const nutriments = food.nutriments || {};
   const nutritionMappings: { [key: string]: string[] } = {
-    'energy': ['energy', 'energy-kcal', 'energy_100g'],
+    'energy': ['energy-kcal', 'energy_kcal', 'energy_100g', 'energy', 'energy-kj', 'energy_kj'],
     'proteins': ['protein', 'proteins', 'protein_100g', 'proteins_100g'],
     'fats': ['fat', 'fats', 'fat_100g'],
     'fat': ['fat', 'fats', 'fat_100g'],

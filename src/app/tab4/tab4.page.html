@@ -83,7 +83,10 @@
               </ion-thumbnail>
               <ion-label>
                 <h2>{{ item.name }}</h2>
-                <p *ngIf="item.energykcal">{{ item.energykcal }} calories</p>
+                <p *ngIf="item.energykcal">
+                  {{ (item.energykcal * item.amount / 100) | number:'1.0-0' }}
+                  calories
+                </p>
               </ion-label>
             </ion-item>
 
@@ -95,8 +98,15 @@
                 *ngIf="item.energykcal || item.proteins || item.fats || item.sugars || item.salts || item.carbohydrates"
                 style="border-top: 1px solid #ccc; padding-top: 16px"
               >
-                <p *ngIf="getCalories(food) > 0">
-                  {{ getCalories(food) }} total calories
+                <p *ngIf="item.energykcal">
+                  {{ (item.energykcal * item.amount / 100) | number:'1.0-0' }}
+                  calories left
+                </p>
+                <p *ngIf="item.energykcal">
+                  {{ item.energykcal }} total calories
+                </p>
+                <p *ngIf="item.energykcal">
+                  {{ item.energykcal }} calories/100{{item.unit}}
                 </p>
                 <p *ngIf="item.proteins">proteins: {{ item.proteins }}</p>
                 <p *ngIf="item.fats">fats: {{ item.fats }}</p>

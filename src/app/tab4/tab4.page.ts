@@ -216,7 +216,7 @@ async cancelScan() {
   await this.stopScan();
 }
 
-  async addFoodByBarcode(barcode: string): Promise<any | null> {
+async addFoodByBarcode(barcode: string): Promise<any | null> {
   const product = await this.firebaseService.fetchProductData(barcode);
   if (!product) {
     alert('Product not found');
@@ -506,6 +506,10 @@ getAllergenString(item: any): string {
     return '';
   }
   return item.allergens.join(', ');
+}
+
+extract(nutrient: string, food: any): number {
+  return this.nutritionService.extractNutritionValue(food, nutrient);
 }
 
 getCalories(food: any): number {

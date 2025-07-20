@@ -95,7 +95,9 @@
                 *ngIf="item.energykcal || item.proteins || item.fats || item.sugars || item.salts || item.carbohydrates"
                 style="border-top: 1px solid #ccc; padding-top: 16px"
               >
-                <p *ngIf="item.energykcal">{{ item.energykcal }} calories</p>
+                <p *ngIf="getCalories(food) > 0">
+                  {{ getCalories(food) }} total calories
+                </p>
                 <p *ngIf="item.proteins">proteins: {{ item.proteins }}</p>
                 <p *ngIf="item.fats">fats: {{ item.fats }}</p>
                 <p *ngIf="item.sugars">sugars: {{ item.sugars }}</p>

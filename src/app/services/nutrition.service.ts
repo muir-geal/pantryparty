@@ -43,7 +43,7 @@ export class NutritionService {
   extractNutritionValue(food: any, nutrientType: string): number {
   if (!food) return 0;
 
-  const type = nutrientType.toLowerCase(); // normalize key
+  const type = nutrientType.toLowerCase();
   const nutrition = food.nutrition || {};
   const nutriments = food.nutriments || {};
   const nutritionMappings: { [key: string]: string[] } = {

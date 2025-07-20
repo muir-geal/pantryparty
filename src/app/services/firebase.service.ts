@@ -297,25 +297,27 @@ async updatePantryWithFood(pantryId: string, food: any) {
   });
 }
 
-async updatePantryDetails(pantryId: string, details: { name: string, nick: string }) {
+async updatePantryDetails(name: string, nick: string) {
+  if (!this.pantryId) {
+    throw new Error('No pantry ID set');
+  }
   try {
-    const pantryRef = doc(this.itemCollection, pantryId); // Make sure this.itemCollection is correct
-    await updateDoc(pantryRef, {
-      name: details.name,
-      nick: details.nick
+    const pantryDoc = doc(this.firestore, this.database, this.pantryId);
+    await updateDoc(pantryDoc, {
+      name: name,
+      nick: nick
     });
-    
-    // Update local storage as well
-    this.updateLocalstorage();
-    
+
+    if (this.pantry) {
+      this.pantry.name = name;
+      this.pantry.nick = nick;
+    }
     return true;
   } catch (error) {
-    console.error('Error updating pantry details:', error);
+    console.error('Error updating pantry:', error);
     throw error;
   }
 }
-
-// Add this method to your FirebaseService class
 
 async updateFoodInPantry(oldFoodItem: any, newFoodItem: any) {
   if (!this.pantry) {
@@ -490,6 +492,17 @@ async logEatenFood(food: EatenFood) {
     await this.loadPantry();
   } catch (err) {
     console.error('Failed to log eaten food:', err);
+  }
+}
+
+async checkIfNickExists(nick: string): Promise<boolean> {
+  try {
+    const q = query(this.itemCollection, where('nick', '==', nick));
+    const c = await getCountFromServer(q);
+    return c.data().count > 0;
+  } catch (error) {
+    console.error('error checking nickname:', error);
+    return false;
   }
 }
 }

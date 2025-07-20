@@ -39,6 +39,9 @@ export class Tab4Page {
   allFoods: any[] = [];
   filteredFoods: any[] = [];
 
+  editName: string = '';
+  editNick: string = '';
+
   sortOption: string = 'name';
 
      sortOptions = [
@@ -503,5 +506,9 @@ getAllergenString(item: any): string {
     return '';
   }
   return item.allergens.join(', ');
+}
+
+getCalories(food: any): number {
+  return this.nutritionService.getTotalCalories(food);
 }
 }

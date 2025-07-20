@@ -1,0 +1,60 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title> Tracker </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="progress-arc-container">
+    <svg viewBox="0 0 100 50" class="progress-arc">
+      <!-- Background arc -->
+      <path
+        d="M 10 50 A 40 40 0 0 1 90 50"
+        fill="none"
+        stroke="#e0e0e0"
+        stroke-width="10"
+      ></path>
+
+      <!-- Foreground arc (progress) -->
+      <path
+        [attr.d]="progressArcPath"
+        fill="none"
+        stroke="#4caf50"
+        stroke-width="10"
+        stroke-linecap="round"
+      ></path>
+    </svg>
+
+    <div class="progress-label">
+      {{ consumedToday }} / {{ dailyLimit }} kcal
+    </div>
+  </div>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Nutrition Details</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>Consumed Today: <strong>{{ consumedToday }} kcal</strong></p>
+      <p>Daily Limit: <strong>{{ dailyLimit }} kcal</strong></p>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-accordion-group>
+      <ion-accordion value="eaten-today">
+        <ion-item slot="header">
+          <ion-label>Eaten Today</ion-label>
+        </ion-item>
+        <ion-list slot="content">
+          <ion-item *ngFor="let item of eatenToday">
+            <ion-label>
+              <h3>{{ item.name }}</h3>
+              <p>{{ item.energykcal }} kcal</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-accordion>
+    </ion-accordion-group>
+  </ion-card>
+</ion-content>

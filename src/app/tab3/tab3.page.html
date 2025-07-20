@@ -1,0 +1,79 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title> Pantries </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-searchbar
+    [(ngModel)]="searchTerm"
+    (ionInput)="filterPantries()"
+    placeholder="search for food..."
+  ></ion-searchbar>
+
+  <ion-item lines="none">
+    <ion-label>sort by:</ion-label>
+    <ion-select
+      [(ngModel)]="sortOption"
+      (ionChange)="onSortOptionChange($event)"
+      interface="popover"
+    >
+      <ion-select-option value="name">name</ion-select-option>
+      <ion-select-option value="type">type</ion-select-option>
+      <ion-select-option value="energykcal">calories</ion-select-option>
+      <ion-select-option value="proteins">proteins</ion-select-option>
+      <ion-select-option value="allergens">allergens</ion-select-option>
+      <ion-select-option value="rating">rating</ion-select-option>
+      <ion-select-option value="expirationdate"
+        >expiration date</ion-select-option
+      >
+    </ion-select>
+  </ion-item>
+
+  <ion-card>
+    <ion-accordion-group>
+      @for(item of filteredPantries; track item.id) {
+      <ion-accordion value="{{ item.id }}">
+        <ion-item slot="header" color="light">
+          <ion-label>
+            <h2>{{ item.name }} ({{ item.foods?.length || 0 }})</h2>
+            <p>{{ item.nick }}</p>
+          </ion-label>
+        </ion-item>
+
+        <ion-list slot="content" *ngIf="item.foods?.length">
+          <ion-item
+            button
+            *ngFor="let food of item.foods"
+            (click)="openFoodDetail(food)"
+          >
+            <ion-thumbnail slot="start" *ngIf="food.image">
+              <img
+                [src]="food.image"
+                style="
+                  border-radius: 10px;
+                  object-fit: cover;
+                  width: 100%;
+                  height: 100%;
+                "
+              />
+            </ion-thumbnail>
+            <ion-label>
+              {{ food.name }} ({{ food.amount }} {{ food.unit }})
+            </ion-label>
+            <ion-badge *ngIf="food.isReserved" slot="end" color="danger"
+              ><ion-icon name="checkmark"></ion-icon
+            ></ion-badge>
+          </ion-item>
+        </ion-list>
+
+        <ion-item slot="content" *ngIf="!item.foods?.length">
+          <ion-label>no food in this pantry</ion-label>
+        </ion-item>
+      </ion-accordion>
+      } @empty {
+      <ion-item>no pantries found</ion-item>
+      }
+    </ion-accordion-group>
+  </ion-card>
+</ion-content>

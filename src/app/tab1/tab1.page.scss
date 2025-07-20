@@ -1,0 +1,17 @@
+.progress-arc-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.progress-arc {
+  width: 200px;
+  height: 100px;
+}
+
+.progress-label {
+  margin-top: 10px;
+  font-size: 1.2em;
+  font-weight: bold;
+}

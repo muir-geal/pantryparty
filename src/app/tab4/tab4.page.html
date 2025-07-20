@@ -1,0 +1,227 @@
+<ion-header [translucent]="true" [class.hidden-during-scan]="isScanning">
+  <ion-toolbar>
+    <ion-title *ngIf="!pantryCreated">My Pantry </ion-title>
+    <ion-title *ngIf="pantryCreated">{{ name }}</ion-title>
+    <ion-button
+      slot="end"
+      *ngIf="pantryCreated"
+      fill="clear"
+      color="dark"
+      (click)="openPantrySettings()"
+      ><ion-icon
+        style="font-size: 1.5rem"
+        slot="icon-only"
+        name="settings-outline"
+      ></ion-icon
+    ></ion-button>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div [class.hidden-during-scan]="isScanning">
+    <ion-card *ngIf="!pantryCreated">
+      <ion-list>
+        <ion-item>
+          <ion-input label="pantry name" [(ngModel)]="name"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input label="nickname" [(ngModel)]="nick"></ion-input>
+        </ion-item>
+        <ion-button
+          shape="round"
+          color="success"
+          expand="block"
+          vertical="bottom"
+          style="padding: 10px"
+          (click)="add()"
+          >save</ion-button
+        >
+      </ion-list>
+    </ion-card>
+
+    <div *ngIf="pantryCreated">
+      <ion-searchbar
+        [(ngModel)]="searchTerm"
+        (ionInput)="filterMyPantry()"
+        placeholder="search for food..."
+      ></ion-searchbar>
+
+      <ion-item lines="none">
+        <ion-label>sort by:</ion-label>
+        <ion-select
+          [(ngModel)]="sortOption"
+          (ionChange)="onSortOptionChange($event)"
+          interface="popover"
+        >
+          <ion-select-option value="name">name</ion-select-option>
+          <ion-select-option value="type">type</ion-select-option>
+          <ion-select-option value="energykcal">calories</ion-select-option>
+          <ion-select-option value="proteins">proteins</ion-select-option>
+          <ion-select-option value="allergens">allergens</ion-select-option>
+          <ion-select-option value="rating">rating</ion-select-option>
+          <ion-select-option value="expirationdate"
+            >expiration date</ion-select-option
+          >
+        </ion-select>
+      </ion-item>
+
+      <ion-card *ngIf="pantryItems?.length" style="color: white">
+        <ion-accordion-group>
+          @for (item of filteredFoods; track item.id) {
+          <ion-accordion>
+            <ion-item slot="header" color="light">
+              <ion-thumbnail slot="start" *ngIf="item.image">
+                <img
+                  [src]="item.image"
+                  style="
+                    border-radius: 10px;
+                    object-fit: cover;
+                    width: 100%;
+                    height: 100%;
+                  "
+                />
+              </ion-thumbnail>
+              <ion-label>
+                <h2>{{ item.name }}</h2>
+                <p *ngIf="item.energykcal">{{ item.energykcal }} calories</p>
+              </ion-label>
+            </ion-item>
+
+            <div class="ion-padding" slot="content" style="font-size: 1.1em">
+              <p>{{ item.amount }} {{ item.unit }}</p>
+              <p>{{ item.available }} {{ item.unit }} available for sharing</p>
+
+              <div
+                *ngIf="item.energykcal || item.proteins || item.fats || item.sugars || item.salts || item.carbohydrates"
+                style="border-top: 1px solid #ccc; padding-top: 16px"
+              >
+                <p *ngIf="item.energykcal">{{ item.energykcal }} calories</p>
+                <p *ngIf="item.proteins">proteins: {{ item.proteins }}</p>
+                <p *ngIf="item.fats">fats: {{ item.fats }}</p>
+                <p *ngIf="item.sugars">sugars: {{ item.sugars }}</p>
+                <p *ngIf="item.salts">salts: {{ item.salts }}</p>
+                <p *ngIf="item.carbohydrates">
+                  carbohydrates: {{ item.carbohydrates }}
+                </p>
+              </div>
+
+              <div
+                *ngIf="countAllergens(item) >= 0"
+                style="
+                  border-top: 1px solid #ccc;
+                  padding-top: 16px;
+                  padding-bottom: 16px;
+                "
+              >
+                <div *ngIf="countAllergens(item) > 0" class="allergen-warning">
+                  <strong>
+                    <ion-icon
+                      name="warning"
+                      color="warning"
+                      style="font-size: 1.2em; vertical-align: text-bottom"
+                    ></ion-icon>
+                    allergens ({{ countAllergens(item) }}):
+                  </strong>
+                  {{ getAllergenString(item) }}
+                </div>
+                <div *ngIf="countAllergens(item) === 0" class="allergen-safe">
+                  <strong>no known allergens</strong>
+                </div>
+              </div>
+
+              <div
+                *ngIf="item.vegan || item.vegetarian || item.halal || item.kosher"
+                style="border-top: 1px solid #ccc; padding-top: 16px"
+              >
+                <p *ngIf="item.vegan">vegan: yes</p>
+                <p *ngIf="item.vegetarian">vegetarian: yes</p>
+                <p *ngIf="item.halal">halal: yes</p>
+                <p *ngIf="item.kosher">kosher: yes</p>
+              </div>
+
+              <div
+                *ngIf="item.notes || item.rating"
+                style="border-top: 1px solid #ccc; padding-top: 16px"
+              >
+                <p *ngIf="item.notes" style="margin-top: 0">
+                  "{{ item.notes }}"
+                </p>
+                <div class="star-rating">
+                  <ng-container *ngFor="let star of [1, 2, 3, 4, 5]">
+                    <ion-icon
+                      style="font-size: 1.5rem"
+                      [name]="star <= item.rating ? 'star' : 'star-outline'"
+                    ></ion-icon>
+                  </ng-container>
+                </div>
+              </div>
+
+              <p
+                *ngIf="item.expirationdate"
+                style="border-top: 1px solid #ccc; padding-top: 16px"
+              >
+                expires on: {{ item.expirationdate }}
+              </p>
+
+              <div
+                class="food-actions ion-text-center"
+                style="margin-top: 16px"
+              >
+                <ion-button fill="clear" color="dark" (click)="eatFoodItem()">
+                  <ion-icon
+                    slot="icon-only"
+                    name="restaurant-outline"
+                  ></ion-icon>
+                </ion-button>
+                <ion-button
+                  fill="clear"
+                  color="dark"
+                  (click)="editFoodItem(item)"
+                >
+                  <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
+                </ion-button>
+                <ion-button
+                  fill="clear"
+                  color="dark"
+                  (click)="deleteFoodItem(item)"
+                >
+                  <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                </ion-button>
+              </div>
+            </div>
+          </ion-accordion>
+          }
+        </ion-accordion-group>
+      </ion-card>
+
+      <ion-button
+        class="ion-margin-top"
+        shape="round"
+        color="danger"
+        style="padding: 10px"
+        (click)="deleteMyPantry()"
+        >delete my pantry</ion-button
+      >
+    </div>
+  </div>
+
+  <div *ngIf="isScanning" class="scanner-overlay">
+    <div class="scanner-frame"></div>
+    <div class="scanner-instructions">scan a barcode</div>
+  </div>
+
+  <button class="close-scanner-btn" (click)="cancelScan()" *ngIf="isScanning">
+    <ion-icon size="large" name="close"></ion-icon>
+  </button>
+
+  <ion-fab
+    *ngIf="pantryCreated && !isScanning"
+    vertical="bottom"
+    horizontal="end"
+    slot="fixed"
+  >
+    <ion-fab-button color="success" (click)="openAddFoodModalWithScan()">
+      <ion-icon size="large" name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

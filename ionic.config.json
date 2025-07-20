@@ -1,0 +1,7 @@
+{
+  "name": "pantryparty",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

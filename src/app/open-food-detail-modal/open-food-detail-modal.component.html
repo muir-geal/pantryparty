@@ -1,0 +1,113 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ food?.name || "food details" }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content
+  class="ion-padding"
+  style="height: 100%; overflow: auto; font-size: 1.1em"
+>
+  <div *ngIf="food">
+    <p>{{ food.amount }} {{ food.unit }}</p>
+    <p *ngIf="food.available > 0">
+      {{ food.available }} {{ food.unit }} available for sharing
+    </p>
+    <p *ngIf="food.available == 0">not available for sharing</p>
+    <div
+      *ngIf="
+        food.energykcal ||
+        food.proteins ||
+        food.fats ||
+        food.sugars ||
+        food.salts ||
+        food.carbohydrates
+      "
+      style="border-top: 1px solid #ccc"
+    >
+      <p *ngIf="food.energykcal">{{ food.energykcal }} calories</p>
+      <p *ngIf="food.proteins">proteins: {{ food.proteins }}</p>
+      <p *ngIf="food.fats">fats: {{ food.fats }}</p>
+      <p *ngIf="food.sugars">sugars: {{ food.sugars }}</p>
+      <p *ngIf="food.salts">salts: {{ food.salts }}</p>
+      <p *ngIf="food.carbohydrates">carbohydrates: {{ food.carbohydrates }}</p>
+    </div>
+    <div
+      *ngIf="countAllergens(food) >= 0"
+      style="
+        border-top: 1px solid #ccc;
+        padding-top: 16px;
+        padding-bottom: 16px;
+      "
+    >
+      <div *ngIf="countAllergens(food) > 0" class="allergen-warning">
+        <strong
+          ><ion-icon
+            name="warning"
+            color="warning"
+            style="font-size: 1.2em; vertical-align: text-bottom"
+          ></ion-icon>
+          allergens ({{ countAllergens(food) }}):</strong
+        >
+        {{ getAllergenString(food) }}
+      </div>
+      <div *ngIf="countAllergens(food) === 0" class="allergen-safe">
+        <strong>no known allergens</strong>
+      </div>
+    </div>
+    <div
+      *ngIf="food.vegan || food.vegetarian || food.halal || food.kosher"
+      style="border-top: 1px solid #ccc"
+    >
+      <p *ngIf="food.vegan">vegan: yes</p>
+      <p *ngIf="food.vegetarian">vegetarian: yes</p>
+      <p *ngIf="food.halal">halal: yes</p>
+      <p *ngIf="food.kosher">kosher: yes</p>
+    </div>
+    <div
+      *ngIf="food.notes || food.rating"
+      style="border-top: 1px solid #ccc; padding-top: 16px"
+    >
+      <p *ngIf="food.notes" style="margin-top: 0">"{{ food.notes }}"</p>
+      <div class="star">
+        <ng-container *ngFor="let star of [1, 2, 3, 4, 5]">
+          <ion-icon [name]="star <= food.rating ? 'star' : 'star-outline'">
+          </ion-icon>
+        </ng-container>
+      </div>
+    </div>
+    <p
+      *ngIf="food.expirationdate"
+      style="border-top: 1px solid #ccc; padding-top: 16px"
+    >
+      expires on: {{ food.expirationdate }}
+    </p>
+    <div *ngIf="food.available > 0">
+      <div *ngIf="!isReserved">
+        <ion-button
+          style="padding-top: 16px"
+          expand="block"
+          shape="round"
+          color="success"
+          (click)="reserveFood()"
+          >reserve food</ion-button
+        >
+      </div>
+      <div *ngIf="isReserved">
+        <ion-button
+          style="padding-top: 16px"
+          expand="block"
+          shape="round"
+          color="danger"
+          (click)="reserveFood()"
+          >cancel reservation</ion-button
+        >
+      </div>
+    </div>
+  </div>
+</ion-content>

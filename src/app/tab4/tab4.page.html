@@ -99,22 +99,23 @@
                 style="border-top: 1px solid #ccc; padding-top: 16px"
               >
                 <p *ngIf="item.nutriments?.['energy-kcal']">
-                  {{ item.nutriments['energy-kcal'] }} calories/100g
+                  {{ (item.nutriments['energy-kcal'] * item.amount / 100) |
+                  number:'1.0-0' }} calories left
                 </p>
                 <p *ngIf="item.nutriments?.proteins">
-                  proteins: {{ item.nutriments.proteins }}g/100g
+                  proteins: {{ item.nutriments.proteins }}g
                 </p>
                 <p *ngIf="item.nutriments?.fat">
-                  fats: {{ item.nutriments.fat }}g/100g
+                  fats: {{ item.nutriments.fat }}grams
                 </p>
                 <p *ngIf="item.nutriments?.sugars">
-                  sugars: {{ item.nutriments.sugars }}g/100g
+                  sugars: {{ item.nutriments.sugars }}g
                 </p>
                 <p *ngIf="item.nutriments?.salt">
-                  salt: {{ item.nutriments.salt }}g/100g
+                  salt: {{ item.nutriments.salt }}g
                 </p>
                 <p *ngIf="item.nutriments?.carbohydrates">
-                  carbohydrates: {{ item.nutriments.carbohydrates }}g/100g
+                  carbohydrates: {{ item.nutriments.carbohydrates }}g
                 </p>
               </div>
 

@@ -20,21 +20,27 @@
     </p>
     <p *ngIf="food.available == 0">not available for sharing</p>
     <div *ngIf="food.nutriments" style="border-top: 1px solid #ccc">
+      <p *ngIf="food.nutriments?.['energy-kcal'] && food.unit != 'pcs'">
+        {{
+          (food.nutriments["energy-kcal"] * food.amount) / 100
+            | number : "1.0-0"
+        }}
+        calories left
+      </p>
       <p *ngIf="food.nutriments?.['energy-kcal']">
-        {{ food.nutriments["energy-kcal"] }} calories/100g
+        {{ food.nutriments["energy-kcal"] }}
+        calories / 100g
       </p>
       <p *ngIf="food.nutriments?.proteins">
-        proteins: {{ food.nutriments.proteins }}g/100g
+        proteins: {{ food.nutriments.proteins }}g
       </p>
       <p *ngIf="food.nutriments?.fat">fats: {{ food.nutriments.fat }}g/100g</p>
       <p *ngIf="food.nutriments?.sugars">
-        sugars: {{ food.nutriments.sugars }}g/100g
+        sugars: {{ food.nutriments.sugars }}g
       </p>
-      <p *ngIf="food.nutriments?.salt">
-        salt: {{ food.nutriments.salt }}g/100g
-      </p>
+      <p *ngIf="food.nutriments?.salt">salt: {{ food.nutriments.salt }}g</p>
       <p *ngIf="food.nutriments?.carbohydrates">
-        carbohydrates: {{ food.nutriments.carbohydrates }}g/100g
+        carbohydrates: {{ food.nutriments.carbohydrates }}g
       </p>
     </div>
     <div

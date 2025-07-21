@@ -6,7 +6,7 @@ import { EatenFood } from '../models/eaten-food';
   providedIn: 'root',
 })
 export class NutritionService {
-  consumedToday: number = 500;
+  consumedToday: number = 0;
   dailyLimit: number = 1700;
   eatenToday: EatenFood[] = [];
 
@@ -168,7 +168,14 @@ export class NutritionService {
       (sum, seg) => sum + seg.value,
       0
     );
-    if (totalNutrientCalories === 0) return [];
+
+    // Always return segments, even if no calories consumed
+    if (totalNutrientCalories === 0) {
+      return rawSegments.map((seg) => ({
+        ...seg,
+        percent: 0.0,
+      }));
+    }
 
     // Compute percentages relative to nutrient breakdown (these should add to 100%)
     let segments = rawSegments.map((seg) => ({

@@ -1,3 +1,5 @@
+//arc:
+
 .progress-arc-container {
   display: flex;
   flex-direction: column;
@@ -10,8 +12,48 @@
   height: 100px;
 }
 
+//label:
+
 .progress-label {
   margin-top: 10px;
   font-size: 1.2em;
-  font-weight: bold;
+  font-weight: normal;
+}
+
+//circle:
+
+.progress-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.circular-chart {
+  max-width: 80%;
+  max-height: 200px;
+  transform: rotate(-90deg);
+}
+
+.circle-bg {
+  fill: none;
+  stroke: #eee;
+  stroke-width: 4.0;
+}
+
+.circle {
+  fill: none;
+  stroke-width: 4.0;
+  stroke: #4CAF50;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.6s ease;
+}
+
+.percentage {
+  fill: #444;
+  font-family: sans-serif;
+  font-size: 0.4em;
+  text-anchor: middle;
+  transform: rotate(90deg);
 }

@@ -26,7 +26,12 @@
             </ion-label>
           </ion-item>-->
 
-        <ion-button shape="round" expand="block" (click)="enableEditing()">
+        <ion-button
+          shape="round"
+          expand="block"
+          color="success"
+          (click)="enableEditing()"
+        >
           edit pantry info
         </ion-button>
         <!--</div>-->
@@ -56,6 +61,7 @@
             <ion-button
               shape="round"
               expand="block"
+              color="success"
               (click)="saveChanges()"
               [disabled]="!editName.trim() || !editNick.trim()"
             >

@@ -48,32 +48,35 @@ export class Tab1Page {
   }
 
   //for the full circle graph:
-  // get progress(): number {
-  //   const ratio = Math.min(this.nutritionService.consumedToday / this.nutritionService.dailyLimit, 1);
-  //   return +(ratio * 100).toFixed(1);
-  // }
-
-  //for the arc:
-  get progressArcPath(): string {
-    const startX = 10;
-    const startY = 50;
-    const endX = 90;
-    const endY = 50;
-
-    const radius = 40;
-    const progressRatio = Math.min(
+  get progress(): number {
+    const ratio = Math.min(
       this.nutritionService.consumedToday / this.nutritionService.dailyLimit,
       1
     );
-    const angle = progressRatio * Math.PI; // range: 0 to π
-
-    // Calculate endpoint using angle
-    const x = 50 + radius * Math.cos(Math.PI - angle);
-    const y = 50 - radius * Math.sin(Math.PI - angle);
-
-    // Large arc flag: 0 if less than half, 1 if more
-    const largeArcFlag = progressRatio > 0.5 ? 1 : 0;
-
-    return `M ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x} ${y}`;
+    return +(ratio * 100).toFixed(1);
   }
+
+  //for the arc:
+  // get progressArcPath(): string {
+  //   const startX = 10;
+  //   const startY = 50;
+  //   const endX = 90;
+  //   const endY = 50;
+
+  //   const radius = 40;
+  //   const progressRatio = Math.min(
+  //     this.nutritionService.consumedToday / this.nutritionService.dailyLimit,
+  //     1
+  //   );
+  //   const angle = progressRatio * Math.PI; // range: 0 to π
+
+  //   // Calculate endpoint using angle
+  //   const x = 50 + radius * Math.cos(Math.PI - angle);
+  //   const y = 50 - radius * Math.sin(Math.PI - angle);
+
+  //   // Large arc flag: 0 if less than half, 1 if more
+  //   const largeArcFlag = progressRatio > 0.5 ? 1 : 0;
+
+  //   return `M ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x} ${y}`;
+  // }
 }

@@ -5,9 +5,8 @@
 </ion-header>
 
 <ion-content>
-  <div class="progress-arc-container">
+  <!--<div class="progress-arc-container">
     <svg viewBox="0 0 100 50" class="progress-arc">
-      <!-- Background arc -->
       <path
         d="M 10 50 A 40 40 0 0 1 90 50"
         fill="none"
@@ -15,7 +14,6 @@
         stroke-width="10"
       ></path>
 
-      <!-- Foreground arc (progress) -->
       <path
         [attr.d]="progressArcPath"
         fill="none"
@@ -25,6 +23,30 @@
       ></path>
     </svg>
 
+    <div class="progress-label">
+      {{ consumedToday }} / {{ dailyLimit }} kcal
+    </div>
+  </div>-->
+
+  <div class="progress-container">
+    <svg viewBox="0 0 36 36" class="circular-chart">
+      <path
+        class="circle-bg"
+        d="M18 2.0845
+             a 15.9155 15.9155 0 0 1 0 31.831
+             a 15.9155 15.9155 0 0 1 0 -31.831"
+      />
+      <path
+        class="circle"
+        [attr.stroke-dasharray]="progress + ', 100'"
+        d="M18 2.0845
+             a 15.9155 15.9155 0 0 1 0 31.831
+             a 15.9155 15.9155 0 0 1 0 -31.831"
+      />
+      <text x="18" y="20.35" class="percentage">
+        {{ consumedToday }} / {{ dailyLimit }} kcal
+      </text>
+    </svg>
     <div class="progress-label">
       {{ consumedToday }} / {{ dailyLimit }} kcal
     </div>

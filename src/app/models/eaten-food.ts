@@ -22,7 +22,7 @@ export interface Nutriments {
   fats: number;
   sugars: number;
   salts: number;
-  // ... add more if needed for tab1/2
+  // ... add more if needed for tab1/2: e.g. iron, fiber
 }
 
 export interface FoodItem extends BaseFood {

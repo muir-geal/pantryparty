@@ -32,15 +32,27 @@
         calories / 100g
       </p>
       <p *ngIf="food.nutriments?.proteins">
-        proteins: {{ food.nutriments.proteins }}g
+        proteins:
+        {{ (food.nutriments.proteins * food.amount) / 100 | number : "1.0-0" }}g
       </p>
-      <p *ngIf="food.nutriments?.fat">fats: {{ food.nutriments.fat }}g/100g</p>
+      <p *ngIf="food.nutriments?.fat">
+        fats:
+        {{ (food.nutriments.fat * food.amount) / 100 | number : "1.0-0" }}g
+      </p>
       <p *ngIf="food.nutriments?.sugars">
-        sugars: {{ food.nutriments.sugars }}g
+        sugars:
+        {{ (food.nutriments.sugars * food.amount) / 100 | number : "1.0-0" }}g
       </p>
-      <p *ngIf="food.nutriments?.salt">salt: {{ food.nutriments.salt }}g</p>
+      <p *ngIf="food.nutriments?.salt">
+        salt:
+        {{ (food.nutriments.salt * food.amount) / 100 | number : "1.0-0" }}g
+      </p>
       <p *ngIf="food.nutriments?.carbohydrates">
-        carbohydrates: {{ food.nutriments.carbohydrates }}g
+        carbohydrates:
+        {{
+          (food.nutriments.carbohydrates * food.amount) / 100
+            | number : "1.0-0"
+        }}g
       </p>
     </div>
     <div

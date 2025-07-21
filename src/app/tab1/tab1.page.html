@@ -28,7 +28,7 @@
     </div>
   </div>-->
 
-  <div class="progress-container">
+  <!--<div class="progress-container">
     <svg viewBox="0 0 36 36" class="circular-chart">
       <path
         class="circle-bg"
@@ -49,6 +49,52 @@
     </svg>
     <div class="progress-label">
       {{ consumedToday }} / {{ dailyLimit }} kcal
+    </div>
+  </div>-->
+
+  <div class="progress-container">
+    <svg viewBox="0 0 36 36" class="circular-chart">
+      <circle class="circle-bg" cx="18" cy="18" r="15.9155" />
+
+      <circle
+        class="circular chart; nutrient-circle"
+        *ngFor="let segment of nutrientCalorieBreakdown(); let i = index"
+        [attr.stroke]="segment.color"
+        [attr.stroke-dasharray]="segment.percent + ', 100'"
+        [attr.stroke-dashoffset]="getSegmentOffset(i)"
+        cx="18"
+        cy="18"
+        r="15.9155"
+        stroke-width="2.5"
+        fill="none"
+      />
+    </svg>
+    <div class="progress-label">
+      {{ consumedToday }} / {{ dailyLimit }} kcal
+    </div>
+  </div>
+
+  <div class="nutrient-legend">
+    <ion-card>
+      <div
+        *ngFor="let nutrient of nutrientCalorieBreakdown()"
+        class="legend-item"
+      >
+        <span class="color-box" [style.background]="nutrient.color"></span>
+        {{ nutrient.name }}: {{ nutrient.percent | number: '1.0-1' }}%
+      </div>
+    </ion-card>
+  </div>
+
+  <div class="nutrient-breakdown">
+    <div
+      *ngFor="let nutrient of nutrientCalorieBreakdown()"
+      style="margin-bottom: 8px"
+    >
+      <span [style.color]="nutrient.color" style="font-weight: bold">
+        {{ nutrient.name }}:
+      </span>
+      {{ nutrient.percent | number:'1.0-0' }}%
     </div>
   </div>
 

@@ -56,6 +56,15 @@ export class Tab1Page {
     return +(ratio * 100).toFixed(1);
   }
 
+  getSegmentOffset(index: number): number {
+    const segments = this.nutritionService.nutrientCalorieBreakdown();
+    let offset = 25;
+    for (let i = 0; i < index; i++) {
+      offset -= segments[i].percent;
+    }
+    return offset;
+  }
+
   //for the arc:
   // get progressArcPath(): string {
   //   const startX = 10;
@@ -79,4 +88,8 @@ export class Tab1Page {
 
   //   return `M ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x} ${y}`;
   // }
+
+  get nutrientCalorieBreakdown() {
+    return this.nutritionService.nutrientCalorieBreakdown;
+  }
 }

@@ -6,7 +6,7 @@ import { EatenFood } from '../models/eaten-food';
   providedIn: 'root',
 })
 export class NutritionService {
-  consumedToday: number = 0;
+  consumedToday: number = 500;
   dailyLimit: number = 1700;
   eatenToday: EatenFood[] = [];
 
@@ -105,5 +105,74 @@ export class NutritionService {
   async getAllEatenFoods(): Promise<EatenFood[]> {
     const pantry = this.firebaseService.getPantry();
     return pantry?.eatenFoods ?? [];
+  }
+
+  nutrientCalorieBreakdown(): {
+    name: string;
+    color: string;
+    percent: number;
+  }[] {
+    const CALORIES_PER_GRAM = {
+      proteins: 4,
+      carbohydrates: 4,
+      fats: 9,
+      sugars: 4,
+      salts: 5,
+    };
+
+    let totalProtein = 0;
+    let totalCarbs = 0;
+    let totalFat = 0;
+    let totalSugars = 0;
+    let totalSalts = 0;
+
+    for (const item of this.eatenToday) {
+      const nutriments = item.nutriments || {};
+
+      totalProtein += Number((nutriments.proteins * item.amount) / 100 || 0);
+      totalCarbs += Number((nutriments.carbohydrates * item.amount) / 100 || 0);
+      totalFat += Number((nutriments.fats * item.amount) / 100 || 0);
+      totalSugars += Number((nutriments.sugars * item.amount) / 100 || 0);
+      totalSalts += Number((nutriments.salts * item.amount) / 100 || 0);
+    }
+
+    const proteinCal = totalProtein * CALORIES_PER_GRAM.proteins;
+    const carbCal = totalCarbs * CALORIES_PER_GRAM.carbohydrates;
+    const fatCal = totalFat * CALORIES_PER_GRAM.fats;
+    const sugarCal = totalSugars * CALORIES_PER_GRAM.sugars;
+    const saltCal = totalSalts * CALORIES_PER_GRAM.salts;
+
+    const total = proteinCal + carbCal + fatCal;
+    if (total === 0) return [];
+
+    return [
+      {
+        name: 'Protein',
+        color: '#4caf50',
+        percent: (proteinCal / total) * 100,
+      },
+      { name: 'Fat', color: '#ff9800', percent: (fatCal / total) * 100 },
+      { name: 'Carbs', color: '#188decff', percent: (carbCal / total) * 100 },
+      { name: 'Sugars', color: '#f321d7ff', percent: (sugarCal / total) * 100 },
+      { name: 'Salts', color: '#21d4f3ff', percent: (saltCal / total) * 100 },
+    ];
+  }
+
+  get totalMacrosConsumedToday(): {
+    proteins: number;
+    carbohydrates: number;
+    fats: number;
+  } {
+    return this.eatenToday.reduce(
+      (totals, item) => {
+        totals.proteins += item.nutriments?.proteins || 0;
+        totals.carbohydrates += item.nutriments?.carbohydrates || 0;
+        totals.fats += item.nutriments?.fats || 0;
+        totals.sugars += item.nutriments?.sugars || 0;
+        totals.salts += item.nutriments?.salts || 0;
+        return totals;
+      },
+      { proteins: 0, carbohydrates: 0, fats: 0, sugars: 0, salts: 0 }
+    );
   }
 }

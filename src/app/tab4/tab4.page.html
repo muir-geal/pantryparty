@@ -114,19 +114,24 @@
                   {{ item.nutriments['energy-kcal']}} calories / 100g
                 </p>
                 <p *ngIf="item.nutriments?.proteins">
-                  proteins: {{ item.nutriments.proteins }}g
+                  proteins: {{ (item.nutriments.proteins * item.amount) / 100 |
+                  number : "1.0-0" }}g
                 </p>
                 <p *ngIf="item.nutriments?.fat">
-                  fats: {{ item.nutriments.fat }}g
+                  fats: {{ (item.nutriments.fat * item.amount) / 100 | number :
+                  "1.0-0" }}g
                 </p>
                 <p *ngIf="item.nutriments?.sugars">
-                  sugars: {{ item.nutriments.sugars }}g
+                  sugars: {{ (item.nutriments.sugars * item.amount) / 100 |
+                  number : "1.0-0" }}g
                 </p>
                 <p *ngIf="item.nutriments?.salt">
-                  salt: {{ item.nutriments.salt }}g
+                  salt: {{ (item.nutriments.salt * item.amount) / 100 | number :
+                  "1.0-0" }}g
                 </p>
                 <p *ngIf="item.nutriments?.carbohydrates">
-                  carbohydrates: {{ item.nutriments.carbohydrates }}g
+                  carbohydrates: {{ (item.nutriments.carbohydrates *
+                  item.amount) / 100 | number : "1.0-0" }}g
                 </p>
               </div>
 

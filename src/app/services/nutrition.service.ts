@@ -96,4 +96,9 @@ export class NutritionService {
     // For units like pcs, assume kcalPer100g is already per unit
     return Math.round(kcalPer100g * amount);
   }
+
+  async getAllEatenFoods(): Promise<EatenFood[]> {
+    const pantry = this.firebaseService.getPantry();
+    return pantry?.eatenFoods ?? [];
+  }
 }

@@ -31,8 +31,8 @@ export class Tab1Page {
       await this.nutritionService.getEatenFoodsToday();
   }
 
-  getCalories(food: EatenFood): number {
-    return this.nutritionService.extractNutritionValue(food, 'energy');
+  getTotalCalories(food: EatenFood): number {
+    return this.nutritionService.getTotalCalories(food);
   }
 
   get consumedToday(): number {

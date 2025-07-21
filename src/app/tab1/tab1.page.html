@@ -35,8 +35,8 @@
       <ion-card-title>Nutrition Details</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <p>Consumed Today: <strong>{{ consumedToday }} kcal</strong></p>
-      <p>Daily Limit: <strong>{{ dailyLimit }} kcal</strong></p>
+      <p>consumed today: <strong>{{ consumedToday }} calories</strong></p>
+      <p>daily limit: <strong>{{ dailyLimit }} calories</strong></p>
     </ion-card-content>
   </ion-card>
 
@@ -50,7 +50,7 @@
           <ion-item *ngFor="let item of eatenToday">
             <ion-label>
               <h3>{{ item.name }}</h3>
-              <p>{{ getCalories(item) }} kcal</p>
+              <p>{{ getTotalCalories(item) }} kcal</p>
             </ion-label>
           </ion-item>
         </ion-list>

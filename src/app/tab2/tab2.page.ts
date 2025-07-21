@@ -69,4 +69,8 @@ export class Tab2Page {
       ((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7
     );
   }
+
+  getTotalCalories(food: EatenFood): number {
+    return this.nutritionService.getTotalCalories(food);
+  }
 }

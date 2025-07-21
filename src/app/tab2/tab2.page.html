@@ -13,15 +13,15 @@
       >
         <ion-item slot="header">
           <ion-label>
-            Week of {{ week.weekStart }}
-            <p>Total: {{ week.totalCalories }} kcal</p>
+            week {{ week.weekStart }}
+            <p>{{ week.totalCalories }} total calories</p>
           </ion-label>
         </ion-item>
         <ion-list slot="content">
           <ion-item *ngFor="let item of week.foods">
             <ion-label>
               <h3>{{ item.name }}</h3>
-              <p>{{ item.nutriments?.['energy-kcal'] || 0 }} kcal</p>
+              <p>{{ getTotalCalories(item) }} calories</p>
             </ion-label>
           </ion-item>
         </ion-list>

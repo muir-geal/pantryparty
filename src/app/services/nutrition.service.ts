@@ -86,10 +86,15 @@ export class NutritionService {
   getTotalCalories(food: any): number {
     const kcalPer100g = this.extractNutritionValue(food, 'energy');
     const amount = food?.amount || 0;
-    const unit = food?.unit || 'g';
+    const unit = food?.unit || 'g' || 'ml';
 
-    // Only adjust if unit is grams
-    if (unit === 'g' || unit === 'gram') {
+    // if g or ml
+    if (
+      unit === 'g' ||
+      unit === 'gram' ||
+      unit === 'ml' ||
+      unit === 'millilitres'
+    ) {
       return Math.round((kcalPer100g * amount) / 100);
     }
 

@@ -53,7 +53,7 @@ export class Tab1Page {
       this.nutritionService.consumedToday / this.nutritionService.dailyLimit,
       1
     );
-    return +(ratio * 100).toFixed(1);
+    return +(ratio * 100).toFixed(2);
   }
 
   getSegmentOffset(index: number): number {

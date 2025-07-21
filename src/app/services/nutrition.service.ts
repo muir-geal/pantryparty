@@ -136,44 +136,49 @@ export class NutritionService {
       totalSalts += Number((nutriments.salts * item.amount) / 100 || 0);
     }
 
-    const proteinCal = totalProtein * CALORIES_PER_GRAM.proteins;
-    const carbCal = totalCarbs * CALORIES_PER_GRAM.carbohydrates;
-    const fatCal = totalFat * CALORIES_PER_GRAM.fats;
-    const sugarCal = totalSugars * CALORIES_PER_GRAM.sugars;
-    const saltCal = totalSalts * CALORIES_PER_GRAM.salts;
-
-    const total = proteinCal + carbCal + fatCal + sugarCal;
-    if (total === 0) return [];
-
-    const intakeRatio = Math.min(this.consumedToday / this.dailyLimit, 1);
-
-    return [
+    const rawSegments = [
       {
         name: 'Protein',
         color: '#4caf50',
-        percent: (proteinCal / total) * 100 * intakeRatio, //to let the circle fill just as much as consumedToday!
+        value: totalProtein * CALORIES_PER_GRAM.proteins,
       },
       {
         name: 'Fat',
         color: '#ff9800',
-        percent: (fatCal / total) * 100 * intakeRatio,
+        value: totalFat * CALORIES_PER_GRAM.fats,
       },
       {
         name: 'Carbs',
         color: '#188decff',
-        percent: (carbCal / total) * 100 * intakeRatio,
+        value: totalCarbs * CALORIES_PER_GRAM.carbohydrates,
       },
       {
         name: 'Sugars',
         color: '#f321d7ff',
-        percent: (sugarCal / total) * 100 * intakeRatio,
+        value: totalSugars * CALORIES_PER_GRAM.sugars,
       },
       {
         name: 'Salts',
         color: '#21d4f3ff',
-        percent: (saltCal / total) * 100 * intakeRatio,
+        value: totalSalts * CALORIES_PER_GRAM.salts,
       },
     ];
+
+    const total = rawSegments.reduce((sum, seg) => sum + seg.value, 0);
+    if (total === 0) return [];
+
+    // Compute percentages and round to 1 decimal
+    const segments = rawSegments.map((seg) => ({
+      ...seg,
+      percent: +((seg.value / total) * 100).toFixed(2),
+    }));
+
+    // Correct total by adjusting the last segment
+    const percentSum = segments.reduce((sum, seg) => sum + seg.percent, 0);
+    const delta = +(100 - percentSum).toFixed(1);
+    segments[segments.length - 1].percent += delta;
+
+    return segments;
   }
 
   get totalMacrosConsumedToday(): {

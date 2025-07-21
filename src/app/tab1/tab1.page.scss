@@ -81,17 +81,39 @@
 //nutrient legend:
 
 .nutrient-legend {
-  margin-top: 10px;
-  font-size: 14px;
+  margin-top: 1rem;
+  width: 100%;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
-.color-box {
-  display: inline-block;
-  border-radius: 100%;
-  width: 12px;
-  height: 12px;
-  margin-right: 8px;
-  vertical-align: middle;
-}
+
 .legend-item {
-  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: white;
+  background: #2c2c2c;
+  padding: 6px 10px;
+  border-radius: 8px;
 }
+
+.legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.legend-name {
+  flex: 1;
+  margin-left: 6px;
+}
+
+.legend-percent {
+  font-weight: bold;
+}
+

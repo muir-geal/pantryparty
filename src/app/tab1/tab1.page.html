@@ -79,26 +79,10 @@
   </div>
 
   <div class="nutrient-legend">
-    <ion-card>
-      <div
-        *ngFor="let nutrient of nutrientCalorieBreakdown()"
-        class="legend-item"
-      >
-        <span class="color-box" [style.background]="nutrient.color"></span>
-        {{ nutrient.name }}: {{ nutrient.percent | number: '1.0-1' }}%
-      </div>
-    </ion-card>
-  </div>
-
-  <div class="nutrient-breakdown">
-    <div
-      *ngFor="let nutrient of nutrientCalorieBreakdown()"
-      style="margin-bottom: 8px"
-    >
-      <span [style.color]="nutrient.color" style="font-weight: bold">
-        {{ nutrient.name }}:
-      </span>
-      {{ nutrient.percent | number:'1.0-0' }}%
+    <div class="legend-item" *ngFor="let segment of nutrientCalorieBreakdown()">
+      <span class="legend-color" [style.background]="segment.color"></span>
+      <span class="legend-name">{{ segment.name }}</span>
+      <span class="legend-percent">{{ segment.percent.toFixed(1) }}%</span>
     </div>
   </div>
 

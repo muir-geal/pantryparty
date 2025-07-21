@@ -15,57 +15,64 @@ export class OpenFoodDetailModalComponent {
 
   isReserved = false;
 
-  constructor(private modalController: ModalController, private nutritionService: NutritionService, private reserveFoodService: ReservefoodService) {}
+  constructor(
+    private modalController: ModalController,
+    private nutritionService: NutritionService,
+    private reserveFoodService: ReservefoodService
+  ) {}
 
-ngOnInit() {
-  this.isReserved = !!this.food?.isReserved;
-}
+  ngOnInit() {
+    this.isReserved = !!this.food?.isReserved;
+  }
 
-dismiss() {
-  this.modalController.dismiss({
-    someBoolean: this.isReserved,
-    foodId: this.food?.barcode,
-  }, 'confirm');
-}
+  dismiss() {
+    this.modalController.dismiss(
+      {
+        someBoolean: this.isReserved,
+        foodId: this.food?.barcode,
+      },
+      'confirm'
+    );
+  }
 
-extract(nutrient: string, food: any): number {
-  return this.nutritionService.extractNutritionValue(food, nutrient);
-}
+  extract(nutrient: string, food: any): number {
+    return this.nutritionService.extractNutritionValue(food, nutrient);
+  }
 
-getCalories(food: any): number {
-  return this.nutritionService.getTotalCalories(food);
-}
+  getCalories(food: any): number {
+    return this.nutritionService.getTotalCalories(food);
+  }
 
-// reserveFood()
-//   {
-//   this.isReserved = !this.isReserved;
-//   }
+  // reserveFood()
+  //   {
+  //   this.isReserved = !this.isReserved;
+  //   }
 
   reserveFood() {
-  // Toggle the local state
-  this.isReserved = !this.isReserved;
-  
-  // Update the service with the new state
-  const identifier = this.food.barcode || this.food.openfoodfactsid;
-  if (identifier) {
-    this.reserveFoodService.toggleReservation(identifier, this.isReserved);
-  }
-  
-  // Also update the food object if you're using it in the template
-  if (this.food) {
-    this.food.isReserved = this.isReserved;
-  }
-}
+    // Toggle the local state
+    this.isReserved = !this.isReserved;
 
-countAllergens(item: any): number {
-  if (!item || !item.allergens) return 0;
-  return item.allergens.length;
-}
+    // Update the service with the new state
+    const identifier = this.food.barcode || this.food.openfoodfactsid;
+    if (identifier) {
+      this.reserveFoodService.toggleReservation(identifier, this.isReserved);
+    }
 
-getAllergenString(item: any): string {
-  if (!item || !item.allergens || item.allergens.length === 0) {
-    return '';
+    // Also update the food object if you're using it in the template
+    if (this.food) {
+      this.food.isReserved = this.isReserved;
+    }
   }
-  return item.allergens.join(', ');
-}
+
+  countAllergens(item: any): number {
+    if (!item || !item.allergens) return 0;
+    return item.allergens.length;
+  }
+
+  getAllergenString(item: any): string {
+    if (!item || !item.allergens || item.allergens.length === 0) {
+      return '';
+    }
+    return item.allergens.join(', ');
+  }
 }

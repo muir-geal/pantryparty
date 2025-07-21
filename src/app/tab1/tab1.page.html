@@ -57,7 +57,6 @@
       <circle class="circle-bg" cx="18" cy="18" r="15.9155" />
 
       <circle
-        class="circular chart; nutrient-circle"
         *ngFor="let segment of nutrientCalorieBreakdown(); let i = index"
         [attr.stroke]="segment.color"
         [attr.stroke-dasharray]="segment.percent + ', 100'"
@@ -68,9 +67,14 @@
         stroke-width="2.5"
         fill="none"
       />
+
+      <text x="18" y="20.35" class="percentage">
+        {{ consumedToday }} / {{ dailyLimit }} kcal
+      </text>
     </svg>
+
     <div class="progress-label">
-      {{ consumedToday }} / {{ dailyLimit }} kcal
+      {{ consumedToday }} / {{ dailyLimit }} calories
     </div>
   </div>
 

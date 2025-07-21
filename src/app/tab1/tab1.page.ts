@@ -58,7 +58,7 @@ export class Tab1Page {
 
   getSegmentOffset(index: number): number {
     const segments = this.nutritionService.nutrientCalorieBreakdown();
-    let offset = 25;
+    let offset = 0;
     for (let i = 0; i < index; i++) {
       offset -= segments[i].percent;
     }

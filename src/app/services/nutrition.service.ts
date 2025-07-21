@@ -142,19 +142,37 @@ export class NutritionService {
     const sugarCal = totalSugars * CALORIES_PER_GRAM.sugars;
     const saltCal = totalSalts * CALORIES_PER_GRAM.salts;
 
-    const total = proteinCal + carbCal + fatCal;
+    const total = proteinCal + carbCal + fatCal + sugarCal;
     if (total === 0) return [];
+
+    const intakeRatio = Math.min(this.consumedToday / this.dailyLimit, 1);
 
     return [
       {
         name: 'Protein',
         color: '#4caf50',
-        percent: (proteinCal / total) * 100,
+        percent: (proteinCal / total) * 100 * intakeRatio, //to let the circle fill just as much as consumedToday!
       },
-      { name: 'Fat', color: '#ff9800', percent: (fatCal / total) * 100 },
-      { name: 'Carbs', color: '#188decff', percent: (carbCal / total) * 100 },
-      { name: 'Sugars', color: '#f321d7ff', percent: (sugarCal / total) * 100 },
-      { name: 'Salts', color: '#21d4f3ff', percent: (saltCal / total) * 100 },
+      {
+        name: 'Fat',
+        color: '#ff9800',
+        percent: (fatCal / total) * 100 * intakeRatio,
+      },
+      {
+        name: 'Carbs',
+        color: '#188decff',
+        percent: (carbCal / total) * 100 * intakeRatio,
+      },
+      {
+        name: 'Sugars',
+        color: '#f321d7ff',
+        percent: (sugarCal / total) * 100 * intakeRatio,
+      },
+      {
+        name: 'Salts',
+        color: '#21d4f3ff',
+        percent: (saltCal / total) * 100 * intakeRatio,
+      },
     ];
   }
 

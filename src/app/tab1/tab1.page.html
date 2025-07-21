@@ -72,10 +72,10 @@
     <div class="progress-label">
       {{ consumedToday }} / {{ dailyLimit }} calories
     </div>
-    <p>consumed today</p>
+    <p style="color: grey">consumed today</p>
   </div>
 
-  <ion-card class="nutrient-legend">
+  <ion-card class="nutrient-legend" style="margin-top: -5px">
     <div class="legend-item" *ngFor="let segment of nutrientCalorieBreakdown()">
       <span class="legend-color" [style.background]="segment.color"></span>
       <span class="legend-name">{{ segment.name }}</span>

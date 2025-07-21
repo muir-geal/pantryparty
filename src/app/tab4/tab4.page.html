@@ -83,10 +83,17 @@
               </ion-thumbnail>
               <ion-label>
                 <h2>{{ item.name }}</h2>
-                <p *ngIf="item.energykcal">
-                  {{ (item.energykcal * item.amount / 100) | number:'1.0-0' }}
-                  calories
-                </p>
+                <div *ngIf="item.unit != 'pcs'">
+                  <p *ngIf="item.nutriments?.['energy-kcal']">
+                    {{ (item.nutriments['energy-kcal'] * item.amount / 100) |
+                    number:'1.0-0' }} calories
+                  </p>
+                </div>
+                <div *ngIf="item.unit == 'pcs'">
+                  <p *ngIf="item.nutriments?.['energy-kcal']">
+                    {{ item.nutriments['energy-kcal']}} calories / 100g
+                  </p>
+                </div>
               </ion-label>
             </ion-item>
 
@@ -101,6 +108,9 @@
                 <p *ngIf="item.nutriments?.['energy-kcal']">
                   {{ (item.nutriments['energy-kcal'] * item.amount / 100) |
                   number:'1.0-0' }} calories left
+                </p>
+                <p *ngIf="item.nutriments?.['energy-kcal']">
+                  {{ item.nutriments['energy-kcal']}} calories / 100g
                 </p>
                 <p *ngIf="item.nutriments?.proteins">
                   proteins: {{ item.nutriments.proteins }}g
@@ -148,7 +158,7 @@
                 style="border-top: 1px solid #ccc; padding-top: 16px"
               >
                 <p *ngIf="item.vegan">vegan: yes</p>
-                <p *ngIf="item.vegetarian">vegetarian: yes</p>
+                <p *ngIf="item.vegetarian && !item.vegan">vegetarian: yes</p>
                 <p *ngIf="item.halal">halal: yes</p>
                 <p *ngIf="item.kosher">kosher: yes</p>
               </div>

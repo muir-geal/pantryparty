@@ -60,11 +60,12 @@
             </ion-thumbnail>
             <ion-label>
               {{ food.name }} ({{ food.amount }} {{ food.unit }})
-              <p *ngIf="getCalories(food) && food.unit == 'pcs'">
-                {{ getCalories(food) }} calories / 100g
+              <p *ngIf="food.nutriments?.['energy-kcal'] && food.unit == 'pcs'">
+                {{ food.nutriments?.['energy-kcal'] }} calories / 100g
               </p>
-              <p *ngIf="getCalories(food) && food.unit != 'pcs'">
-                {{ (getCalories(food) * food.amount / 100) | number:'1.0-0' }}
+              <p *ngIf="food.nutriments?.['energy-kcal'] && food.unit != 'pcs'">
+                {{ (food.nutriments?.['energy-kcal'] * food.amount / 100) |
+                number:'1.0-0' }} calories
               </p>
             </ion-label>
             <ion-badge *ngIf="food.isReserved" slot="end" color="danger"

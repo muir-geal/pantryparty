@@ -71,7 +71,7 @@
       style="border-top: 1px solid #ccc"
     >
       <p *ngIf="food.vegan">vegan: yes</p>
-      <p *ngIf="food.vegetarian">vegetarian: yes</p>
+      <p *ngIf="food.vegetarian && !food.vegan">vegetarian: yes</p>
       <p *ngIf="food.halal">halal: yes</p>
       <p *ngIf="food.kosher">kosher: yes</p>
     </div>

@@ -10,59 +10,70 @@ import { EatenFood } from '../models/eaten-food';
   standalone: false,
 })
 export class Tab1Page {
-
-  constructor(private firebaseService: FirebaseService, private nutritionService: NutritionService) {}
+  constructor(
+    private firebaseService: FirebaseService,
+    private nutritionService: NutritionService
+  ) {}
 
   // ngOnInit() {
   //  this.loadCaloriesConsumedToday();
   // }
 
-async ionViewWillEnter() {
-  await this.firebaseService.loadPantry();
-  this.loadCaloriesConsumedToday();
+  async ionViewWillEnter() {
+    await this.firebaseService.loadPantry();
+    this.loadCaloriesConsumedToday();
   }
 
-async loadCaloriesConsumedToday() {
-  this.nutritionService.consumedToday = await this.nutritionService.getCaloriesConsumedToday();
-  this.nutritionService.eatenToday = await this.nutritionService.getEatenFoodsToday();
-}
+  async loadCaloriesConsumedToday() {
+    this.nutritionService.consumedToday =
+      await this.nutritionService.getCaloriesConsumedToday();
+    this.nutritionService.eatenToday =
+      await this.nutritionService.getEatenFoodsToday();
+  }
 
-get consumedToday(): number {
-  return this.nutritionService.consumedToday;
-}
+  getCalories(food: EatenFood): number {
+    return this.nutritionService.extractNutritionValue(food, 'energy');
+  }
 
-get dailyLimit(): number {
-  return this.nutritionService.dailyLimit;
-}
+  get consumedToday(): number {
+    return this.nutritionService.consumedToday;
+  }
 
-get eatenToday(): EatenFood[] {
-  return this.nutritionService.eatenToday;
-}
+  get dailyLimit(): number {
+    return this.nutritionService.dailyLimit;
+  }
 
-//for the full circle graph:
-// get progress(): number {
-//   const ratio = Math.min(this.nutritionService.consumedToday / this.nutritionService.dailyLimit, 1);
-//   return +(ratio * 100).toFixed(1);
-// }
+  get eatenToday(): EatenFood[] {
+    return this.nutritionService.eatenToday;
+  }
 
-//for the arc:
-get progressArcPath(): string {
-  const startX = 10;
-  const startY = 50;
-  const endX = 90;
-  const endY = 50;
+  //for the full circle graph:
+  // get progress(): number {
+  //   const ratio = Math.min(this.nutritionService.consumedToday / this.nutritionService.dailyLimit, 1);
+  //   return +(ratio * 100).toFixed(1);
+  // }
 
-  const radius = 40;
-  const progressRatio = Math.min(this.nutritionService.consumedToday / this.nutritionService.dailyLimit, 1);
-  const angle = progressRatio * Math.PI; // range: 0 to π
+  //for the arc:
+  get progressArcPath(): string {
+    const startX = 10;
+    const startY = 50;
+    const endX = 90;
+    const endY = 50;
 
-  // Calculate endpoint using angle
-  const x = 50 + radius * Math.cos(Math.PI - angle);
-  const y = 50 - radius * Math.sin(Math.PI - angle);
+    const radius = 40;
+    const progressRatio = Math.min(
+      this.nutritionService.consumedToday / this.nutritionService.dailyLimit,
+      1
+    );
+    const angle = progressRatio * Math.PI; // range: 0 to π
 
-  // Large arc flag: 0 if less than half, 1 if more
-  const largeArcFlag = progressRatio > 0.5 ? 1 : 0;
+    // Calculate endpoint using angle
+    const x = 50 + radius * Math.cos(Math.PI - angle);
+    const y = 50 - radius * Math.sin(Math.PI - angle);
 
-  return `M ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x} ${y}`;
-}
+    // Large arc flag: 0 if less than half, 1 if more
+    const largeArcFlag = progressRatio > 0.5 ? 1 : 0;
+
+    return `M ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x} ${y}`;
+  }
 }

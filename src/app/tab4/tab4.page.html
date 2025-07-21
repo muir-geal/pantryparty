@@ -101,8 +101,9 @@
               <p>{{ item.amount }} {{ item.unit }}</p>
               <p>{{ item.available }} {{ item.unit }} available for sharing</p>
 
+              <!-- eventuell ngIf nochmal anpassen mit allen einzelnen Werten, falls das doch noch Probleme macht: -->
               <div
-                *ngIf="item.nutriments"
+                *ngIf="item.nutriments?.['energy-kcal']"
                 style="border-top: 1px solid #ccc; padding-top: 16px"
               >
                 <p *ngIf="item.nutriments?.['energy-kcal']">
@@ -158,6 +159,7 @@
                 style="border-top: 1px solid #ccc; padding-top: 16px"
               >
                 <p *ngIf="item.vegan">vegan: yes</p>
+                <!-- !item.vegan anders ausdrücken: falls es false ist -->
                 <p *ngIf="item.vegetarian && !item.vegan">vegetarian: yes</p>
                 <p *ngIf="item.halal">halal: yes</p>
                 <p *ngIf="item.kosher">kosher: yes</p>
@@ -191,7 +193,11 @@
                 class="food-actions ion-text-center"
                 style="margin-top: 16px"
               >
-                <ion-button fill="clear" color="dark" (click)="eatFoodItem()">
+                <ion-button
+                  fill="clear"
+                  color="dark"
+                  (click)="eatFoodItem(item)"
+                >
                   <ion-icon
                     slot="icon-only"
                     name="restaurant-outline"

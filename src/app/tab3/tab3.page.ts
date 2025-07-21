@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { FirebaseService } from '../services/firebase.service';
 import { ModalController } from '@ionic/angular';
-import { OpenFoodDetailModalComponent } from '../open-food-detail-modal/open-food-detail-modal.component';
+import { OpenFoodDetailModalComponent } from '../modals/open-food-detail-modal/open-food-detail-modal.component';
 import { ReservefoodService } from '../services/reserve-food.service';
 import { NutritionService } from '../services/nutrition.service';
 

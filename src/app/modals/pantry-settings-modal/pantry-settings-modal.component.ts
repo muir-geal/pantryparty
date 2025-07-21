@@ -1,7 +1,7 @@
 import { OnInit } from '@angular/core';
 import { Component, inject, Input } from '@angular/core';
-import { ModalController, AlertController  } from '@ionic/angular';
-import { FirebaseService } from '../services/firebase.service';
+import { ModalController, AlertController } from '@ionic/angular';
+import { FirebaseService } from '../../services/firebase.service';
 
 @Component({
   selector: 'app-pantry-settings-modal',
@@ -9,8 +9,7 @@ import { FirebaseService } from '../services/firebase.service';
   styleUrls: ['./pantry-settings-modal.component.scss'],
   standalone: false,
 })
-export class PantrySettingsModalComponent  implements OnInit {
-
+export class PantrySettingsModalComponent implements OnInit {
   firebaseService = inject(FirebaseService);
 
   @Input() currentName: string = '';
@@ -21,7 +20,10 @@ export class PantrySettingsModalComponent  implements OnInit {
   pantryCreated = true;
   pantryItems: any[] = [];
 
-  constructor(private modalController: ModalController, private alertController: AlertController) {}
+  constructor(
+    private modalController: ModalController,
+    private alertController: AlertController
+  ) {}
 
   ngOnInit() {
     this.editName = this.currentName;
@@ -35,7 +37,6 @@ export class PantrySettingsModalComponent  implements OnInit {
   enableEditing() {
     this.isEditing = true;
   }
-
 
   cancelEditing() {
     this.editName = this.currentName;
@@ -56,11 +57,14 @@ export class PantrySettingsModalComponent  implements OnInit {
       }
     }
     try {
-      await this.firebaseService.updatePantryDetails(this.editName, this.editNick);
+      await this.firebaseService.updatePantryDetails(
+        this.editName,
+        this.editNick
+      );
       this.modalController.dismiss({
         updated: true,
         name: this.editName,
-        nick: this.editNick
+        nick: this.editNick,
       });
       this.showAlert('success', 'Pantry updated successfully!');
     } catch (error) {
@@ -69,27 +73,28 @@ export class PantrySettingsModalComponent  implements OnInit {
     }
   }
 
-async checkNicknameAvailability(nick: string): Promise<boolean> {
+  async checkNicknameAvailability(nick: string): Promise<boolean> {
     return await this.firebaseService.checkIfNickExists(nick);
   }
 
-async showAlert(header: string, message: string) {
+  async showAlert(header: string, message: string) {
     const alert = await this.alertController.create({
       header,
       message,
-      buttons: ['OK']
+      buttons: ['OK'],
     });
     await alert.present();
   }
 
-async deletePantry() {
+  async deletePantry() {
     const alert = await this.alertController.create({
       header: 'delete pantry',
-      message: 'Are you sure you want to delete this pantry? This action cannot be undone.',
+      message:
+        'Are you sure you want to delete this pantry? This action cannot be undone.',
       buttons: [
         {
           text: 'cancel',
-          role: 'cancel'
+          role: 'cancel',
         },
         {
           text: 'delete',
@@ -98,24 +103,27 @@ async deletePantry() {
             try {
               await this.firebaseService.deletePantry();
               localStorage.removeItem('pantry');
-             
+
               this.modalController.dismiss({
-                deleted: true
+                deleted: true,
               });
             } catch (error) {
               console.error('error deleting pantry:', error);
-              this.showAlert('error', 'Failed to delete pantry. Please try again.');
+              this.showAlert(
+                'error',
+                'Failed to delete pantry. Please try again.'
+              );
             }
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
     await alert.present();
   }
 
-// async deleteMyPantry() {
-//     await this.modalController.dismiss({
-//       action: 'delete'
-//     });
-//   }
+  // async deleteMyPantry() {
+  //     await this.modalController.dismiss({
+  //       action: 'delete'
+  //     });
+  //   }
 }

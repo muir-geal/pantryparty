@@ -50,7 +50,7 @@
           <ion-item *ngFor="let item of eatenToday">
             <ion-label>
               <h3>{{ item.name }}</h3>
-              <p>{{ item.energykcal }} kcal</p>
+              <p>{{ getCalories(item) }} kcal</p>
             </ion-label>
           </ion-item>
         </ion-list>

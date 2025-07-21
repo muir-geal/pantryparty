@@ -1,8 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { ModalController } from '@ionic/angular';
-import { NutritionService } from '../services/nutrition.service';
-import { ReservefoodService } from '../services/reserve-food.service';
+import { NutritionService } from '../../services/nutrition.service';
+import { ReservefoodService } from '../../services/reserve-food.service';
 
 @Component({
   selector: 'app-open-food-detail-modal',

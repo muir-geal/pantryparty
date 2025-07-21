@@ -164,19 +164,24 @@ export class NutritionService {
       },
     ];
 
-    const total = rawSegments.reduce((sum, seg) => sum + seg.value, 0);
-    if (total === 0) return [];
+    const totalNutrientCalories = rawSegments.reduce(
+      (sum, seg) => sum + seg.value,
+      0
+    );
+    if (totalNutrientCalories === 0) return [];
 
-    // Compute percentages and round to 1 decimal
-    const segments = rawSegments.map((seg) => ({
+    // Compute percentages relative to nutrient breakdown (these should add to 100%)
+    let segments = rawSegments.map((seg) => ({
       ...seg,
-      percent: +((seg.value / total) * 100).toFixed(2),
+      percent: +((seg.value / totalNutrientCalories) * 100).toFixed(2),
     }));
 
-    // Correct total by adjusting the last segment
+    // Correct total by adjusting the last segment to ensure exactly 100%
     const percentSum = segments.reduce((sum, seg) => sum + seg.percent, 0);
-    const delta = +(100 - percentSum).toFixed(1);
-    segments[segments.length - 1].percent += delta;
+    const delta = +(100 - percentSum).toFixed(2);
+    if (Math.abs(delta) > 0.01 && segments.length > 0) {
+      segments[segments.length - 1].percent += delta;
+    }
 
     return segments;
   }

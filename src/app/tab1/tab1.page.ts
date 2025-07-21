@@ -58,11 +58,20 @@ export class Tab1Page {
 
   getSegmentOffset(index: number): number {
     const segments = this.nutritionService.nutrientCalorieBreakdown();
+    const consumptionRatio = this.consumedToday / this.dailyLimit;
     let offset = 0;
     for (let i = 0; i < index; i++) {
-      offset -= segments[i].percent;
+      // Scale the offset by consumption ratio for visual representation
+      offset -= segments[i].percent * consumptionRatio;
     }
     return offset;
+  }
+
+  getSegmentDashArray(segment: any): string {
+    const consumptionRatio = this.consumedToday / this.dailyLimit;
+    // Scale the segment percentage by consumption ratio for visual arc length
+    const visualPercent = +(segment.percent * consumptionRatio).toFixed(2);
+    return `${visualPercent}, 100`;
   }
 
   //for the arc:

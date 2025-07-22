@@ -21,6 +21,12 @@ export class Tab2Page {
   }[] = [];
 
   async ionViewWillEnter() {
+    if (!this.firebaseService.pantryId) {
+      const savedId = localStorage.getItem('pantry');
+      if (savedId) {
+        this.firebaseService.pantryId = savedId;
+      }
+    }
     await this.firebaseService.loadPantry();
     if (!this.firebaseService.pantryId) {
       this.weeklySummaries = [];

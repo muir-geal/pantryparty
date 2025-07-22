@@ -1,3 +1,114 @@
-<p>
-  manual-food-modal works!
-</p>
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Add Food:</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content
+  fullscreen
+  scrollY="true"
+  class="modal-body"
+  cssClass="custom-modal"
+>
+  <ion-list lines="none">
+    <ion-item *ngIf="food">
+      <ion-label position="floating">name</ion-label>
+      <ion-input [(ngModel)]="newName"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">amount</ion-label>
+      <ion-input type="number" [(ngModel)]="newAmount"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-select
+        [(ngModel)]="newUnit"
+        interface="action-sheet"
+        placeholder="unit"
+      >
+        <ion-select-option value="pcs">pieces</ion-select-option>
+        <ion-select-option value="g">grams</ion-select-option>
+        <ion-select-option value="ml">milliliters</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-input type="number" [(ngModel)]="proteins"></ion-input>
+      <ion-label position="floating">protein / 100g</ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-input type="number" [(ngModel)]="fats"></ion-input>
+      <ion-label position="floating">fat / 100g</ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-input type="number" [(ngModel)]="sugars"></ion-input>
+      <ion-label position="floating">sugar / 100g</ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-input type="number" [(ngModel)]="salts"></ion-input>
+      <ion-label position="floating">salt / 100g</ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-input type="number" [(ngModel)]="carbohydrates"></ion-input>
+      <ion-label position="floating">carbohydrates / 100g</ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-select
+        [(ngModel)]="newType"
+        interface="action-sheet"
+        placeholder="type"
+      >
+        <ion-select-option value="drink">drink</ion-select-option>
+        <ion-select-option value="vegetable">vegetable</ion-select-option>
+        <ion-select-option value="fruit">fruit</ion-select-option>
+        <ion-select-option value="bread">bread</ion-select-option>
+        <ion-select-option value="pasta">pasta</ion-select-option>
+        <ion-select-option value="dairy">dairy</ion-select-option>
+        <ion-select-option value="fish">fish</ion-select-option>
+        <ion-select-option value="meat">meat</ion-select-option>
+        <ion-select-option value="sweet">sweet</ion-select-option>
+        <ion-select-option value="snacks">snacks</ion-select-option>
+        <ion-select-option value="other">other</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">available</ion-label>
+      <ion-input type="number" [(ngModel)]="newAvailable"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">notes</ion-label>
+      <ion-textarea [(ngModel)]="newNotes"></ion-textarea>
+    </ion-item>
+
+    <ion-item>
+      <div class="star-rating">
+        <ng-container *ngFor="let star of [1, 2, 3, 4, 5]">
+          <ion-icon
+            [name]="star <= newRating ? 'star' : 'star-outline'"
+            (click)="setRating(star)"
+            class="star"
+            style="font-size: 1.5rem"
+          >
+          </ion-icon>
+        </ng-container>
+      </div>
+    </ion-item>
+
+    <ion-button
+      expand="block"
+      color="dark"
+      shape="round"
+      style="padding: 10px"
+      (click)="saveFood()"
+      >save</ion-button
+    >
+  </ion-list>
+</ion-content>

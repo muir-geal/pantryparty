@@ -8,11 +8,12 @@ import {
   LensFacing,
 } from '@capacitor-mlkit/barcode-scanning';
 import { AddFoodModalComponent } from '../modals/add-food-modal/add-food-modal.component';
-import { ModalController } from '@ionic/angular';
+import { ActionSheetController, ModalController } from '@ionic/angular';
 import { AlertController } from '@ionic/angular';
 import { PantrySettingsModalComponent } from '../modals/pantry-settings-modal/pantry-settings-modal.component';
 import { NutritionService } from '../services/nutrition.service';
 import { EatenFood } from '../models/eaten-food';
+import { ManualFoodModalComponent } from '../modals/manual-food-modal/manual-food-modal.component';
 
 @Component({
   selector: 'app-tab4',
@@ -63,7 +64,8 @@ export class Tab4Page {
     private firestore: Firestore,
     private modalController: ModalController,
     private alertController: AlertController,
-    private nutritionService: NutritionService
+    private nutritionService: NutritionService,
+    private actionSheetController: ActionSheetController
   ) {}
 
   async ngOnInit() {
@@ -124,6 +126,50 @@ export class Tab4Page {
       this.allFoods = [];
       this.filteredFoods = [];
     }
+  }
+
+  async openFoodActions() {
+    const actionSheet = await this.actionSheetController.create({
+      header: 'add food',
+      cssClass: 'custom-sheet',
+      buttons: [
+        {
+          text: 'scan barcode',
+          icon: 'barcode-outline',
+          role: 'barcode',
+          handler: () => {
+            this.openAddFoodModalWithScan();
+          },
+        },
+        {
+          text: 'add manually',
+          icon: 'create-outline',
+          role: 'manual',
+          handler: () => {
+            this.openManualFoodModal();
+          },
+        },
+        {
+          text: 'cancel',
+          icon: 'close',
+          role: 'cancel',
+        },
+      ],
+    });
+    await actionSheet.present();
+  }
+
+  async openManualFoodModal() {
+    const modal = await this.modalController.create({
+      component: ManualFoodModalComponent,
+      cssClass: 'food-detail-modal',
+      componentProps: {
+        isEditing: false,
+        food: this.firebaseService.createFoodItem(),
+      },
+    });
+
+    await modal.present();
   }
 
   async scanBarcode() {

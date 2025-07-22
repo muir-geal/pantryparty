@@ -265,3 +265,12 @@ ion-button {
 .green-glow {
   box-shadow: 0 0 10px rgba(74, 155, 142, 0.3);
 }
+
+ion-action-sheet.custom-sheet {
+  --background: #1e1e1e;
+  --button-background-hover: #2a2a2a;
+  --button-color: #fff;
+  --header-color: #aaa;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}

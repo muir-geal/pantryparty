@@ -109,7 +109,8 @@ export class NutritionService {
 
   nutrientCalorieBreakdown(): {
     name: string;
-    color: string;
+    chartColor: string;
+    legendColor: string;
     percent: number;
   }[] {
     const CALORIES_PER_GRAM = {
@@ -174,6 +175,8 @@ export class NutritionService {
       return rawSegments.map((seg) => ({
         ...seg,
         percent: 0.0,
+        chartColor: '#ffffff',
+        legendColor: seg.color,
       }));
     }
 
@@ -181,6 +184,8 @@ export class NutritionService {
     let segments = rawSegments.map((seg) => ({
       ...seg,
       percent: +((seg.value / totalNutrientCalories) * 100).toFixed(2),
+      chartColor: seg.color,
+      legendColor: seg.color,
     }));
 
     // Correct total by adjusting the last segment to ensure exactly 100%

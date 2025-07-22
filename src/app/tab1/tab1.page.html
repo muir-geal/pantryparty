@@ -58,7 +58,7 @@
 
       <circle
         *ngFor="let segment of nutrientCalorieBreakdown(); let i = index"
-        [attr.stroke]="segment.color"
+        [attr.stroke]="segment.chartColor"
         [attr.stroke-dasharray]="getSegmentDashArray(segment)"
         [attr.stroke-dashoffset]="getSegmentOffset(i)"
         cx="18"
@@ -77,7 +77,10 @@
 
   <ion-card class="nutrient-legend" style="margin-top: -5px">
     <div class="legend-item" *ngFor="let segment of nutrientCalorieBreakdown()">
-      <span class="legend-color" [style.background]="segment.color"></span>
+      <span
+        class="legend-color"
+        [style.background]="segment.legendColor"
+      ></span>
       <span class="legend-name">{{ segment.name }}</span>
       <span class="legend-percent">{{ segment.percent.toFixed(2) }}%</span>
     </div>

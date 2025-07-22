@@ -7,7 +7,7 @@ import { EatenFood } from '../models/eaten-food';
 })
 export class NutritionService {
   consumedToday: number = 0;
-  dailyLimit: number = 1700;
+  dailyLimit: number = 0;
   eatenToday: EatenFood[] = [];
 
   constructor(private firebaseService: FirebaseService) {}

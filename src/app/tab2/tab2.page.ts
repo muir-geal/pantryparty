@@ -21,19 +21,29 @@ export class Tab2Page {
   }[] = [];
 
   async ionViewWillEnter() {
-    if (!this.firebaseService.pantryId) {
-      const savedId = localStorage.getItem('pantry');
-      if (savedId) {
-        this.firebaseService.pantryId = savedId;
-      }
+    const savedId = localStorage.getItem('pantry');
+    if (!savedId) {
+      this.clearLocalData();
+      return;
     }
+    this.firebaseService.pantryId = savedId;
     await this.firebaseService.loadPantry();
-    if (!this.firebaseService.pantryId) {
-      this.weeklySummaries = [];
+
+    const pantry = this.firebaseService.getPantry();
+    if (!pantry) {
+      this.clearLocalData();
+      localStorage.removeItem('pantry');
       return;
     }
     const eatenFoods = await this.nutritionService.getEatenFoodsToday();
     this.weeklySummaries = this.groupFoodsByWeek(eatenFoods);
+  }
+
+  private clearLocalData() {
+    this.nutritionService.consumedToday = 0;
+    this.nutritionService.eatenToday = [];
+    this.nutritionService.dailyLimit = 0;
+    this.weeklySummaries = [];
   }
 
   groupFoodsByWeek(

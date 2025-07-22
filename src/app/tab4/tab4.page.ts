@@ -68,26 +68,68 @@ export class Tab4Page {
     private actionSheetController: ActionSheetController
   ) {}
 
-  async ngOnInit() {
+  // async ngOnInit() {
+  //   // await this.firebaseService.deleteMyTestPantries('testy');
+  //   // await this.firebaseService.deleteMyTestPantries('0');
+
+  //   const savedId = localStorage.getItem('pantry');
+  //   if (savedId) {
+  //     this.firebaseService.pantryId = savedId;
+  //     await this.firebaseService.loadPantry();
+
+  //     const pantry = this.firebaseService.getPantry();
+  //     if (pantry) {
+  //       this.name = pantry.name;
+  //       this.nick = pantry.nick;
+  //       this.pantryCreated = true;
+  //       this.pantryItems = pantry.foods || [];
+  //       this.allFoods = pantry.foods || [];
+  //       this.filteredFoods = [...this.allFoods];
+  //     }
+  //   }
+  //   this.loadPantryItems();
+  // }
+
+  async ionViewWillEnter() {
     // await this.firebaseService.deleteMyTestPantries('testy');
     // await this.firebaseService.deleteMyTestPantries('0');
 
     const savedId = localStorage.getItem('pantry');
-    if (savedId) {
-      this.firebaseService.pantryId = savedId;
-      await this.firebaseService.loadPantry();
-
-      const pantry = this.firebaseService.getPantry();
-      if (pantry) {
-        this.name = pantry.name;
-        this.nick = pantry.nick;
-        this.pantryCreated = true;
-        this.pantryItems = pantry.foods || [];
-        this.allFoods = pantry.foods || [];
-        this.filteredFoods = [...this.allFoods];
-      }
+    if (!savedId) {
+      this.resetPantryState();
+      return;
     }
-    this.loadPantryItems();
+
+    if (this.firebaseService.pantryId !== savedId) {
+      this.firebaseService.pantryId = savedId;
+    }
+
+    await this.firebaseService.loadPantry();
+    const pantry = this.firebaseService.getPantry();
+
+    if (!pantry) {
+      this.resetPantryState();
+      localStorage.removeItem('pantry');
+      return;
+    }
+
+    this.name = pantry.name;
+    this.nick = pantry.nick;
+    this.pantryCreated = true;
+    this.pantryItems = pantry.foods || [];
+    this.allFoods = pantry.foods || [];
+    this.filteredFoods = [...this.allFoods];
+    this.updateFilteredFoods();
+  }
+
+  private resetPantryState() {
+    this.pantryCreated = false;
+    this.pantryItems = [];
+    this.allFoods = [];
+    this.filteredFoods = [];
+    this.name = '';
+    this.nick = '';
+    this.firebaseService.pantryId = '';
   }
 
   async add() {
@@ -447,13 +489,15 @@ export class Tab4Page {
 
   async deleteMyPantry() {
     await this.firebaseService.deletePantry();
-    this.pantryCreated = false;
-    this.pantryItems = [];
-    this.allFoods = [];
-    this.filteredFoods = [];
-    this.name = '';
-    this.nick = '';
     localStorage.removeItem('pantry');
+    this.firebaseService.pantryId = '';
+    this.resetPantryState();
+    // this.pantryCreated = false;
+    // this.pantryItems = [];
+    // this.allFoods = [];
+    // this.filteredFoods = [];
+    // this.name = '';
+    // this.nick = '';
   }
 
   async editFoodItem(item: any) {

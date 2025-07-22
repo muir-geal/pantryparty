@@ -20,17 +20,27 @@ export class Tab1Page {
   // }
 
   async ionViewWillEnter() {
-    if (!this.firebaseService.pantryId) {
-      const savedId = localStorage.getItem('pantry');
-      if (savedId) {
-        this.firebaseService.pantryId = savedId;
-      }
+    const savedId = localStorage.getItem('pantry');
+    if (!savedId) {
+      this.clearLocalData();
+      return;
     }
+    this.firebaseService.pantryId = savedId;
     await this.firebaseService.loadPantry();
-    if (!this.firebaseService.pantryId) {
+
+    const pantry = this.firebaseService.getPantry();
+    if (!pantry) {
+      this.clearLocalData();
+      localStorage.removeItem('pantry');
       return;
     }
     this.loadCaloriesConsumedToday();
+  }
+
+  private clearLocalData() {
+    this.nutritionService.consumedToday = 0;
+    this.nutritionService.eatenToday = [];
+    this.nutritionService.dailyLimit = 0;
   }
 
   async loadCaloriesConsumedToday() {

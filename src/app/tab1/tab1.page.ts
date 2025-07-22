@@ -21,6 +21,9 @@ export class Tab1Page {
 
   async ionViewWillEnter() {
     await this.firebaseService.loadPantry();
+    if (!this.firebaseService.pantryId) {
+      return;
+    }
     this.loadCaloriesConsumedToday();
   }
 

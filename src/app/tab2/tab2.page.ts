@@ -22,7 +22,11 @@ export class Tab2Page {
 
   async ionViewWillEnter() {
     await this.firebaseService.loadPantry();
-    const eatenFoods = await this.nutritionService.getEatenFoodsToday(); // or a new getAllEatenFoods() method
+    if (!this.firebaseService.pantryId) {
+      this.weeklySummaries = [];
+      return;
+    }
+    const eatenFoods = await this.nutritionService.getEatenFoodsToday();
     this.weeklySummaries = this.groupFoodsByWeek(eatenFoods);
   }
 

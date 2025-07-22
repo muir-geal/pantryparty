@@ -11,6 +11,7 @@ import { AddFoodModalComponent } from './modals/add-food-modal/add-food-modal.co
 import { FormsModule } from '@angular/forms';
 import { OpenFoodDetailModalComponent } from './modals/open-food-detail-modal/open-food-detail-modal.component';
 import { PantrySettingsModalComponent } from './modals/pantry-settings-modal/pantry-settings-modal.component';
+import { ManualFoodModalComponent } from './modals/manual-food-modal/manual-food-modal.component';
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import { PantrySettingsModalComponent } from './modals/pantry-settings-modal/pan
     AddFoodModalComponent,
     OpenFoodDetailModalComponent,
     PantrySettingsModalComponent,
+    ManualFoodModalComponent,
   ],
   imports: [
     BrowserModule,

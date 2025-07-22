@@ -34,8 +34,13 @@ export class FirebaseService {
   pantry: any = null;
 
   constructor() {
-    if (localStorage.getItem('pantry')) {
-      this.pantryId = localStorage.getItem('pantry');
+    // if (localStorage.getItem('pantry')) {
+    //   this.pantryId = localStorage.getItem('pantry');
+    //   this.loadPantry();
+    // }
+    const storedPantryId = localStorage.getItem('pantryId');
+    if (storedPantryId) {
+      this.pantryId = storedPantryId;
       this.loadPantry();
     }
   }
@@ -75,6 +80,7 @@ export class FirebaseService {
         foods: [],
       });
       this.pantryId = doc.id;
+      localStorage.setItem('pantryId', this.pantryId);
       this.loadPantry();
       return true;
     } else {
@@ -364,7 +370,17 @@ export class FirebaseService {
     }
   }
 
+  // async loadPantry() {
+  //   this.pantry = await getDoc(doc(this.itemCollection, this.pantryId));
+  //   this.updateLocalstorage();
+  // }
+
   async loadPantry() {
+    if (!this.pantryId || this.pantryId.trim() === '') {
+      console.log('Pantry ID not set yet, user may not be authenticated');
+      return;
+    }
+
     this.pantry = await getDoc(doc(this.itemCollection, this.pantryId));
     this.updateLocalstorage();
   }

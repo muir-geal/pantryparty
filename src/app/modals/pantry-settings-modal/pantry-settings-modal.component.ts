@@ -3,6 +3,7 @@ import { Component, inject, Input } from '@angular/core';
 import { ModalController, AlertController } from '@ionic/angular';
 import { FirebaseService } from '../../services/firebase.service';
 import { NutritionService } from 'src/app/services/nutrition.service';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-pantry-settings-modal',
@@ -26,7 +27,8 @@ export class PantrySettingsModalComponent implements OnInit {
   constructor(
     private modalController: ModalController,
     private alertController: AlertController,
-    private nutritionService: NutritionService
+    private nutritionService: NutritionService,
+    private toastController: ToastController
   ) {}
 
   ngOnInit() {
@@ -39,8 +41,20 @@ export class PantrySettingsModalComponent implements OnInit {
     this.modalController.dismiss();
   }
 
-  setDailyLimit() {
+  async setDailyLimit() {
     this.nutritionService.setDailyLimit(this.newDailyLimit);
+
+    // Show success toast
+    const toast = await this.toastController.create({
+      message: `daily limit set to ${this.newDailyLimit} calories`,
+      duration: 2000,
+      color: 'success',
+      position: 'bottom',
+    });
+    await toast.present();
+
+    // Close modal
+    this.dismiss();
   }
 
   getCurrentLimit(): number {

@@ -21,7 +21,7 @@ export class Tab2Page {
   }[] = [];
 
   async ionViewWillEnter() {
-    const savedId = localStorage.getItem('pantry');
+    const savedId = localStorage.getItem('pantryId');
     if (!savedId) {
       this.clearLocalData();
       return;
@@ -32,7 +32,7 @@ export class Tab2Page {
     const pantry = this.firebaseService.getPantry();
     if (!pantry) {
       this.clearLocalData();
-      localStorage.removeItem('pantry');
+      localStorage.removeItem('pantryId');
       return;
     }
     const eatenFoods = await this.nutritionService.getEatenFoodsToday();

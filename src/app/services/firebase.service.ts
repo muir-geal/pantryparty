@@ -364,9 +364,9 @@ export class FirebaseService {
 
   updateLocalstorage() {
     if (this.pantry) {
-      localStorage.setItem('pantry', this.pantryId);
+      localStorage.setItem('pantryId', this.pantryId);
     } else {
-      localStorage.removeItem('pantry');
+      localStorage.removeItem('pantryId');
     }
   }
 

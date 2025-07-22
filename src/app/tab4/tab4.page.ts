@@ -94,7 +94,7 @@ export class Tab4Page {
     // await this.firebaseService.deleteMyTestPantries('testy');
     // await this.firebaseService.deleteMyTestPantries('0');
 
-    const savedId = localStorage.getItem('pantry');
+    const savedId = localStorage.getItem('pantryId');
     if (!savedId) {
       this.resetPantryState();
       return;
@@ -109,7 +109,7 @@ export class Tab4Page {
 
     if (!pantry) {
       this.resetPantryState();
-      localStorage.removeItem('pantry');
+      localStorage.removeItem('pantryId');
       return;
     }
 
@@ -489,7 +489,7 @@ export class Tab4Page {
 
   async deleteMyPantry() {
     await this.firebaseService.deletePantry();
-    localStorage.removeItem('pantry');
+    localStorage.removeItem('pantryId');
     this.firebaseService.pantryId = '';
     this.resetPantryState();
     // this.pantryCreated = false;

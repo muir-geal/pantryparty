@@ -474,10 +474,13 @@ export class Tab4Page {
   }
 
   async openPantrySettings() {
+    const pantryData = await this.firebaseService.getPantry();
     const modal = await this.modalController.create({
       component: PantrySettingsModalComponent,
       componentProps: {
         nutritionService: this.nutritionService,
+        currentName: pantryData?.name || '',
+        currentNick: pantryData?.nick || '',
       },
       breakpoints: [0, 0.5, 1],
       initialBreakpoint: 1,

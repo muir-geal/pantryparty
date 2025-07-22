@@ -48,7 +48,6 @@
         >
           edit pantry name
         </ion-button>
-        <!--</div>-->
 
         <div *ngIf="isEditing">
           <ion-item>
@@ -114,13 +113,6 @@
     >
       set daily calorie limit
     </ion-button>
-
-    <ion-item *ngIf="newDailyLimit > 0">
-      <ion-label>
-        <h3>current daily calorie limit</h3>
-        <p>{{ newDailyLimit }} calories</p>
-      </ion-label>
-    </ion-item>
 
     <ion-button
       class="ion-margin-top"

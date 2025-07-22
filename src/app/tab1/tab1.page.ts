@@ -50,6 +50,10 @@ export class Tab1Page {
       await this.nutritionService.getEatenFoodsToday();
   }
 
+  getDailyLimit(): number {
+    return this.nutritionService.getDailyLimit();
+  }
+
   getTotalCalories(food: EatenFood): number {
     return this.nutritionService.getTotalCalories(food);
   }

@@ -2,6 +2,7 @@ import { OnInit } from '@angular/core';
 import { Component, inject, Input } from '@angular/core';
 import { ModalController, AlertController } from '@ionic/angular';
 import { FirebaseService } from '../../services/firebase.service';
+import { NutritionService } from 'src/app/services/nutrition.service';
 
 @Component({
   selector: 'app-pantry-settings-modal',
@@ -20,18 +21,30 @@ export class PantrySettingsModalComponent implements OnInit {
   pantryCreated = true;
   pantryItems: any[] = [];
 
+  newDailyLimit: number = 0;
+
   constructor(
     private modalController: ModalController,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private nutritionService: NutritionService
   ) {}
 
   ngOnInit() {
     this.editName = this.currentName;
     this.editNick = this.currentNick;
+    this.newDailyLimit = this.nutritionService.getDailyLimit();
   }
 
   dismiss() {
     this.modalController.dismiss();
+  }
+
+  setDailyLimit() {
+    this.nutritionService.setDailyLimit(this.newDailyLimit);
+  }
+
+  getCurrentLimit(): number {
+    return this.nutritionService.getDailyLimit();
   }
 
   enableEditing() {

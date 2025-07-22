@@ -26,13 +26,27 @@
             </ion-label>
           </ion-item>-->
 
+        <ion-item>
+          <ion-label>
+            <h3>{{ currentName }}</h3>
+            <p>{{ currentNick }}</p>
+          </ion-label>
+        </ion-item>
+
+        <ion-item *ngIf="newDailyLimit > 0">
+          <ion-label>
+            <h3>current daily calorie limit</h3>
+            <p>{{ newDailyLimit }} calories</p>
+          </ion-label>
+        </ion-item>
+
         <ion-button
           shape="round"
           expand="block"
           color="success"
           (click)="enableEditing()"
         >
-          edit pantry info
+          edit pantry name
         </ion-button>
         <!--</div>-->
 
@@ -80,6 +94,33 @@
         </div>
       </ion-card-content>
     </ion-card>
+
+    <ion-item>
+      <ion-label position="stacked">Daily Calorie Limit</ion-label>
+      <ion-input
+        type="number"
+        [(ngModel)]="newDailyLimit"
+        placeholder="enter daily calorie limit"
+      >
+      </ion-input>
+    </ion-item>
+
+    <ion-button
+      shape="round"
+      expand="block"
+      color="success"
+      (click)="setDailyLimit()"
+      [disabled]="newDailyLimit < 0"
+    >
+      set daily calorie limit
+    </ion-button>
+
+    <ion-item *ngIf="newDailyLimit > 0">
+      <ion-label>
+        <h3>current daily calorie limit</h3>
+        <p>{{ newDailyLimit }} calories</p>
+      </ion-label>
+    </ion-item>
 
     <ion-button
       class="ion-margin-top"

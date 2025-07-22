@@ -49,6 +49,8 @@ export class Tab4Page {
 
   sortOption: string = 'name';
 
+  newDailyLimit: number = 0;
+
   sortOptions = [
     { value: 'name', label: 'alphabetically' },
     { value: 'type', label: 'type' },
@@ -89,6 +91,11 @@ export class Tab4Page {
   //   }
   //   this.loadPantryItems();
   // }
+
+  ngOnInit() {
+    // Initialize with current limit
+    this.newDailyLimit = this.nutritionService.getDailyLimit();
+  }
 
   async ionViewWillEnter() {
     // await this.firebaseService.deleteMyTestPantries('testy');
@@ -469,6 +476,9 @@ export class Tab4Page {
   async openPantrySettings() {
     const modal = await this.modalController.create({
       component: PantrySettingsModalComponent,
+      componentProps: {
+        nutritionService: this.nutritionService,
+      },
       breakpoints: [0, 0.5, 1],
       initialBreakpoint: 1,
       canDismiss: true,

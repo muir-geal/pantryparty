@@ -10,10 +10,28 @@ export class NutritionService {
   dailyLimit: number = 0;
   eatenToday: EatenFood[] = [];
 
-  constructor(private firebaseService: FirebaseService) {}
+  constructor(private firebaseService: FirebaseService) {
+    this.loadDailyLimit();
+  }
 
   async logFood(food: EatenFood): Promise<void> {
     await this.firebaseService.logEatenFood(food);
+  }
+
+  setDailyLimit(limit: number): void {
+    this.dailyLimit = limit;
+    localStorage.setItem('dailyCalorieLimit', limit.toString());
+  }
+
+  getDailyLimit(): number {
+    return this.dailyLimit;
+  }
+
+  private loadDailyLimit(): void {
+    const saved = localStorage.getItem('dailyCalorieLimit');
+    if (saved) {
+      this.dailyLimit = parseInt(saved, 10) || 0;
+    }
   }
 
   async getCaloriesConsumedToday(): Promise<number> {

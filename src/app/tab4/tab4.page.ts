@@ -478,12 +478,14 @@ export class Tab4Page {
 
     modal.onDidDismiss().then(async (result) => {
       if (result.data) {
-        if (result.data.action === 'delete') {
-          await this.deleteMyPantry();
+        if (result.data.action === 'delete' || result.data.deleted === true) {
+          localStorage.removeItem('pantry');
+          localStorage.removeItem('pantryId');
+          this.firebaseService.pantryId = '';
+          this.resetPantryState();
         }
       }
     });
-
     await modal.present();
   }
 

@@ -11,7 +11,7 @@
 
 <ion-content class="ion-padding">
   <div *ngIf="pantryCreated">
-    <ion-item>
+    <!--<ion-item>
       <ion-label
         ><h2>pantry name: {{ currentName }}</h2>
         <p>nickname: {{ currentNick }}</p></ion-label
@@ -36,7 +36,6 @@
         >
         </ion-input>
       </ion-item>
-
       <ion-item>
         <ion-input
           [(ngModel)]="editNick"
@@ -46,7 +45,6 @@
         >
         </ion-input>
       </ion-item>
-
       <div class="ion-margin-top">
         <ion-button
           shape="round"
@@ -57,7 +55,6 @@
         >
           save changes
         </ion-button>
-
         <ion-button
           shape="round"
           expand="block"
@@ -67,16 +64,49 @@
           cancel
         </ion-button>
       </div>
-    </div>
-    <ion-item *ngIf="newDailyLimit > 0">
+    </div>-->
+
+    <ion-item>
+      <ion-label position="stacked">pantry name</ion-label>
+      <ion-input
+        [(ngModel)]="editName"
+        placeholder="enter pantry name"
+        type="text"
+        maxlength="50"
+      >
+      </ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">nickname</ion-label>
+      <ion-input
+        [(ngModel)]="editNick"
+        placeholder="enter nickname"
+        type="text"
+        maxlength="20"
+      >
+      </ion-input>
+    </ion-item>
+
+    <ion-button
+      shape="round"
+      expand="block"
+      color="dark"
+      (click)="saveChanges()"
+      [disabled]="!editName.trim() || !editNick.trim()"
+    >
+      set pantry info
+    </ion-button>
+
+    <!--<ion-item *ngIf="newDailyLimit > 0">
       <ion-label>
         <p>current daily calorie limit</p>
         <h2>{{ newDailyLimit }} calories</h2>
       </ion-label>
-    </ion-item>
+    </ion-item>-->
 
-    <ion-item>
-      <ion-label position="stacked">Daily Calorie Limit</ion-label>
+    <ion-item style="margin-top: 25px">
+      <ion-label position="stacked">daily calorie limit</ion-label>
       <ion-input
         type="number"
         [(ngModel)]="newDailyLimit"
@@ -96,7 +126,7 @@
     </ion-button>
 
     <ion-button
-      class="ion-margin-top"
+      style="margin-top: 50px"
       expand="block"
       shape="round"
       color="danger"

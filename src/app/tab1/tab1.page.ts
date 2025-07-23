@@ -62,6 +62,10 @@ export class Tab1Page {
     return this.nutritionService.consumedToday;
   }
 
+  get caloriesConsumedToday() {
+    return this.nutritionService.getCaloriesConsumedToday();
+  }
+
   get dailyLimit(): number {
     return this.nutritionService.dailyLimit;
   }

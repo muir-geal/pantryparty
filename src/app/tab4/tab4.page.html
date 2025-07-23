@@ -113,6 +113,10 @@
                 <p *ngIf="item.nutriments?.['energy-kcal']">
                   {{ item.nutriments['energy-kcal']}} calories / 100g
                 </p>
+                <p *ngIf="item.nutriments?.['energy-kcal_serving']">
+                  {{ item.nutriments['energy-kcal_serving']}} calories per
+                  serving
+                </p>
                 <p *ngIf="item.nutriments?.proteins">
                   protein: {{ (item.nutriments.proteins * item.amount) / 100 |
                   number : "1.0-0" }}g

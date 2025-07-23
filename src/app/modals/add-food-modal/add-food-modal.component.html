@@ -34,6 +34,32 @@
     </ion-item>
 
     <ion-item>
+      <ion-input type="number" [(ngModel)]="energykcal"></ion-input>
+      <ion-label slot="end">calories / 100g</ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-input type="number" [(ngModel)]="proteins"></ion-input>
+      <ion-label slot="end">protein / 100g</ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-input type="number" [(ngModel)]="fats"></ion-input>
+      <ion-label slot="end">fat / 100g</ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-input type="number" [(ngModel)]="sugars"></ion-input>
+      <ion-label slot="end">sugar / 100g</ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-input type="number" [(ngModel)]="salts"></ion-input>
+      <ion-label slot="end">salt / 100g</ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-input type="number" [(ngModel)]="carbohydrates"></ion-input>
+      <ion-label slot="end">carbohydrates / 100g</ion-label>
+    </ion-item>
+
+    <ion-item>
       <ion-select
         [(ngModel)]="newType"
         interface="action-sheet"

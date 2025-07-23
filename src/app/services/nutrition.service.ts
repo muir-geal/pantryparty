@@ -46,11 +46,46 @@ export class NutritionService {
       (food: EatenFood) => food.timestamp >= startTimestamp
     );
 
-    return todayFoods.reduce(
-      (sum: number, food: EatenFood) =>
-        sum + (this.extractNutritionValue(food, 'energy') || 0),
-      0
-    );
+    return todayFoods.reduce((sum: number, food: EatenFood) => {
+      // Use the same calculation logic as getTotalCalories()
+      const kcalPer100g = this.extractNutritionValue(food, 'energy') || 0;
+      const amount = food?.amount || 0;
+      const unit = food?.unit || 'g';
+
+      let calories = 0;
+      if (
+        unit === 'g' ||
+        unit === 'gram' ||
+        unit === 'ml' ||
+        unit === 'millilitres'
+      ) {
+        calories = Math.round((kcalPer100g * amount) / 100);
+      } else {
+        // For units like pcs, assume kcalPer100g is already per unit
+        calories = Math.round(kcalPer100g * amount);
+      }
+
+      return sum + calories;
+    }, 0);
+  }
+
+  getTotalCalories(food: any): number {
+    const kcalPer100g = this.extractNutritionValue(food, 'energy');
+    const amount = food?.amount || 0;
+    const unit = food?.unit || 'g' || 'ml';
+
+    // if g or ml
+    if (
+      unit === 'g' ||
+      unit === 'gram' ||
+      unit === 'ml' ||
+      unit === 'millilitres'
+    ) {
+      return Math.round((kcalPer100g * amount) / 100);
+    }
+
+    // For units like pcs, assume kcalPer100g is already per unit
+    return Math.round(kcalPer100g * amount);
   }
 
   async getEatenFoodsToday(): Promise<EatenFood[]> {
@@ -99,25 +134,6 @@ export class NutritionService {
       if (!isNaN(num)) return num;
     }
     return 0;
-  }
-
-  getTotalCalories(food: any): number {
-    const kcalPer100g = this.extractNutritionValue(food, 'energy');
-    const amount = food?.amount || 0;
-    const unit = food?.unit || 'g' || 'ml';
-
-    // if g or ml
-    if (
-      unit === 'g' ||
-      unit === 'gram' ||
-      unit === 'ml' ||
-      unit === 'millilitres'
-    ) {
-      return Math.round((kcalPer100g * amount) / 100);
-    }
-
-    // For units like pcs, assume kcalPer100g is already per unit
-    return Math.round(kcalPer100g * amount);
   }
 
   async getAllEatenFoods(): Promise<EatenFood[]> {

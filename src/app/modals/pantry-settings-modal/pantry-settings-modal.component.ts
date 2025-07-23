@@ -121,6 +121,9 @@ export class PantrySettingsModalComponent implements OnInit {
         this.editNick
       );
 
+      this.currentName = this.editName;
+      this.currentNick = this.editNick;
+
       this.modalController.dismiss({
         updated: true,
         name: this.editName,

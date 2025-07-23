@@ -476,6 +476,7 @@ export class Tab4Page {
   }
 
   async openPantrySettings() {
+    await this.firebaseService.loadPantry(); //WORKED, made the new name/nick refresh instantly within the modal
     const pantryData = await this.firebaseService.getPantry();
     const modal = await this.modalController.create({
       component: PantrySettingsModalComponent,
@@ -520,7 +521,7 @@ export class Tab4Page {
       }
       if (result.data?.updated) {
         console.log('Calling loadPantryData()');
-        this.name = result.data.name;
+        this.name = result.data.name; //WORKED, made the new name/nick refresh instantly on tab4
         this.nick = result.data.nick;
         // await this.firebaseService.loadPantry();
         this.loadPantryData();

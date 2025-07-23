@@ -97,6 +97,47 @@ export class Tab3Page {
     console.log('Final filteredPantries after loading:', this.filteredPantries);
   }
 
+  // filterPantries() {
+  //   const term = this.searchTerm.toLowerCase().trim();
+
+  //   if (!term) {
+  //     this.filteredPantries = [...this.allPantries];
+  //     return;
+  //   }
+
+  //   this.filteredPantries = this.allPantries
+  //     .map((pantry) => {
+  //       const matchingFoods = (pantry.foods || []).filter((food: any) =>
+  //         [
+  //           food.name,
+  //           food.amount ? `amount ${food.amount}` : '',
+  //           food.available ? `available ${food.available}` : '',
+  //           food.expirationdate,
+  //           food.notes,
+  //           food.type,
+  //           food.unit,
+  //           food.vegan ? 'vegan' : '',
+  //           food.vegetarian ? 'vegetarian' : '',
+  //           food.halal ? 'halal' : '',
+  //           food.kosher ? 'kosher' : '',
+  //           food.energykcal ? `calories ${food.energykcal}` : '',
+  //           food.proteins ? `proteins ${food.proteins}` : '',
+  //           food.fats ? `fats ${food.fats}` : '',
+  //           food.sugars ? `sugars ${food.sugars}` : '',
+  //           food.salts ? `salts ${food.salts}` : '',
+  //           food.carbohydrates ? `carbohydrates ${food.carbohydrates}` : '',
+  //         ]
+  //           .filter(Boolean)
+  //           .some((field) => field.toLowerCase().includes(term))
+  //       );
+
+  //       return matchingFoods.length > 0
+  //         ? { ...pantry, foods: matchingFoods }
+  //         : null;
+  //     })
+  //     .filter(Boolean);
+  // }
+
   filterPantries() {
     const term = this.searchTerm.toLowerCase().trim();
 
@@ -120,12 +161,24 @@ export class Tab3Page {
             food.vegetarian ? 'vegetarian' : '',
             food.halal ? 'halal' : '',
             food.kosher ? 'kosher' : '',
-            food.energykcal ? `calories ${food.energykcal}` : '',
-            food.proteins ? `proteins ${food.proteins}` : '',
-            food.fats ? `fats ${food.fats}` : '',
-            food.sugars ? `sugars ${food.sugars}` : '',
-            food.salts ? `salts ${food.salts}` : '',
-            food.carbohydrates ? `carbohydrates ${food.carbohydrates}` : '',
+
+            // Updated to use the new nested structure
+            food.nutriments?.['energy-kcal']
+              ? `calories ${food.nutriments['energy-kcal']}`
+              : '',
+            food.nutriments?.proteins
+              ? `proteins ${food.nutriments.proteins}`
+              : '',
+            food.nutriments?.fat ? `fats ${food.nutriments.fat}` : '',
+            food.nutriments?.sugars ? `sugars ${food.nutriments.sugars}` : '',
+            food.nutriments?.salt ? `salt ${food.nutriments.salt}` : '',
+            food.nutriments?.carbohydrates
+              ? `carbohydrates ${food.nutriments.carbohydrates}`
+              : '',
+
+            // Additional searchable fields from your new structure
+            food.allergens ? food.allergens.join(' ') : '',
+            food.openfoodfactsid ? food.openfoodfactsid : '',
           ]
             .filter(Boolean)
             .some((field) => field.toLowerCase().includes(term))

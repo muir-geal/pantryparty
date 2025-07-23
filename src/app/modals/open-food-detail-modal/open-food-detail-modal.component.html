@@ -31,28 +31,49 @@
         {{ food.nutriments["energy-kcal"] }}
         calories / 100g
       </p>
-      <p *ngIf="food.nutriments?.proteins">
-        proteins:
+      <p *ngIf="food.nutriments?.proteins && food.unit != 'pcs'">
+        <!-- IF PCS: only use /100g!!-->
+        protein:
         {{ (food.nutriments.proteins * food.amount) / 100 | number : "1.0-0" }}g
       </p>
-      <p *ngIf="food.nutriments?.fat">
-        fats:
+      <p *ngIf="food.nutriments?.fat && food.unit != 'pcs'">
+        fat:
         {{ (food.nutriments.fat * food.amount) / 100 | number : "1.0-0" }}g
       </p>
-      <p *ngIf="food.nutriments?.sugars">
-        sugars:
+      <p *ngIf="food.nutriments?.sugars && food.unit != 'pcs'">
+        sugar:
         {{ (food.nutriments.sugars * food.amount) / 100 | number : "1.0-0" }}g
       </p>
-      <p *ngIf="food.nutriments?.salt">
+      <p *ngIf="food.nutriments?.salt && food.unit != 'pcs'">
         salt:
         {{ (food.nutriments.salt * food.amount) / 100 | number : "1.0-0" }}g
       </p>
-      <p *ngIf="food.nutriments?.carbohydrates">
+      <p *ngIf="food.nutriments?.carbohydrates && food.unit != 'pcs'">
         carbohydrates:
         {{
           (food.nutriments.carbohydrates * food.amount) / 100
             | number : "1.0-0"
         }}g
+      </p>
+      <p *ngIf="food.nutriments?.proteins && food.unit == 'pcs'">
+        protein:
+        {{ food.nutriments.proteins }} / 100g
+      </p>
+      <p *ngIf="food.nutriments?.fat && food.unit == 'pcs'">
+        fat:
+        {{ food.nutriments.fat }} / 100g
+      </p>
+      <p *ngIf="food.nutriments?.sugars && food.unit == 'pcs'">
+        sugar:
+        {{ food.nutriments.sugars }} / 100g
+      </p>
+      <p *ngIf="food.nutriments?.salt && food.unit == 'pcs'">
+        salt:
+        {{ food.nutriments.salt * food.amount }} / 100g
+      </p>
+      <p *ngIf="food.nutriments?.carbohydrates && food.unit == 'pcs'">
+        carbohydrates:
+        {{ food.nutriments.carbohydrates * food.amount }} / 100g
       </p>
     </div>
     <div

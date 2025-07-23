@@ -712,6 +712,40 @@ export class Tab4Page {
     await successAlert.present();
   }
 
+  // filterMyPantry() {
+  //   const term = this.searchTerm.toLowerCase().trim();
+
+  //   if (!term) {
+  //     this.filteredFoods = [...this.allFoods];
+  //     return;
+  //   }
+
+  //   this.filteredFoods = (this.allFoods || []).filter((food: any) => {
+  //     const searchFields = [
+  //       food.name,
+  //       food.type,
+  //       food.notes,
+  //       food.unit,
+  //       food.vegan ? 'vegan' : '',
+  //       food.vegetarian ? 'vegetarian' : '',
+  //       food.halal ? 'halal' : '',
+  //       food.kosher ? 'kosher' : '',
+  //       food.amount ? `amount ${food.amount}` : '',
+  //       food.available ? `available ${food.available}` : '',
+  //       food.energykcal ? `calories ${food.energykcal}` : '',
+  //       food.proteins ? `proteins ${food.proteins}` : '',
+  //       food.fats ? `fats ${food.fats}` : '',
+  //       food.sugars ? `sugars ${food.sugars}` : '',
+  //       food.salts ? `salts ${food.salts}` : '',
+  //       food.carbohydrates ? `carbohydrates ${food.carbohydrates}` : '',
+  //     ]
+  //       .filter(Boolean)
+  //       .join(' ');
+
+  //     return searchFields.toLowerCase().includes(term);
+  //   });
+  // }
+
   filterMyPantry() {
     const term = this.searchTerm.toLowerCase().trim();
 
@@ -732,12 +766,24 @@ export class Tab4Page {
         food.kosher ? 'kosher' : '',
         food.amount ? `amount ${food.amount}` : '',
         food.available ? `available ${food.available}` : '',
-        food.energykcal ? `calories ${food.energykcal}` : '',
-        food.proteins ? `proteins ${food.proteins}` : '',
-        food.fats ? `fats ${food.fats}` : '',
-        food.sugars ? `sugars ${food.sugars}` : '',
-        food.salts ? `salts ${food.salts}` : '',
-        food.carbohydrates ? `carbohydrates ${food.carbohydrates}` : '',
+
+        // Updated to use the new nested structure
+        food.nutriments?.['energy-kcal']
+          ? `calories ${food.nutriments['energy-kcal']}`
+          : '',
+        food.nutriments?.proteins ? `proteins ${food.nutriments.proteins}` : '',
+        food.nutriments?.fat ? `fats ${food.nutriments.fat}` : '',
+        food.nutriments?.sugars ? `sugars ${food.nutriments.sugars}` : '',
+        food.nutriments?.salt ? `salt ${food.nutriments.salt}` : '',
+        food.nutriments?.carbohydrates
+          ? `carbohydrates ${food.nutriments.carbohydrates}`
+          : '',
+
+        // Also include allergens in search
+        food.allergens ? food.allergens.join(' ') : '',
+
+        // Include OpenFoodFacts ID for barcode searches
+        food.openfoodfactsid ? food.openfoodfactsid : '',
       ]
         .filter(Boolean)
         .join(' ');

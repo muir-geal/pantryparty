@@ -14,6 +14,7 @@ import { PantrySettingsModalComponent } from '../modals/pantry-settings-modal/pa
 import { NutritionService } from '../services/nutrition.service';
 import { EatenFood } from '../models/eaten-food';
 import { ManualFoodModalComponent } from '../modals/manual-food-modal/manual-food-modal.component';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-tab4',
@@ -67,7 +68,8 @@ export class Tab4Page {
     private modalController: ModalController,
     private alertController: AlertController,
     private nutritionService: NutritionService,
-    private actionSheetController: ActionSheetController
+    private actionSheetController: ActionSheetController,
+    private toastController: ToastController
   ) {}
 
   // async ngOnInit() {
@@ -377,7 +379,7 @@ export class Tab4Page {
       openfoodfactsid: barcode, // Store the barcode as OpenFoodFacts ID
       expirationdate: product.expiration_date || '',
       amount: this.amount || 1,
-      available: this.amount || 1,
+      available: this.amount || 0,
       unit: '',
 
       // Dietary flags
@@ -489,7 +491,25 @@ export class Tab4Page {
       cssClass: 'pantry-settings-modal',
     });
 
+    // modal.onDidDismiss().then(async (result) => {
+    //   console.log('Modal dismissed with result:', result.data);
+    //   if (result.data) {
+    //     if (result.data.action === 'delete' || result.data.deleted === true) {
+    //       localStorage.removeItem('pantry');
+    //       localStorage.removeItem('pantryId');
+    //       this.firebaseService.pantryId = '';
+    //       this.resetPantryState();
+    //     }
+    //   }
+    //   if (result.data?.updated) {
+    //     console.log('Calling loadPantryData()');
+    //     this.loadPantryData();
+    //   }
+    // });
+    // await modal.present();
     modal.onDidDismiss().then(async (result) => {
+      console.log('Modal dismissed with result:', result.data);
+
       if (result.data) {
         if (result.data.action === 'delete' || result.data.deleted === true) {
           localStorage.removeItem('pantry');
@@ -498,8 +518,33 @@ export class Tab4Page {
           this.resetPantryState();
         }
       }
+      if (result.data?.updated) {
+        console.log('Calling loadPantryData()');
+        this.name = result.data.name;
+        this.nick = result.data.nick;
+        // await this.firebaseService.loadPantry();
+        this.loadPantryData();
+        const toast = await this.toastController.create({
+          message: 'Pantry updated successfully!',
+          duration: 2000,
+          color: 'success',
+          position: 'bottom',
+        });
+        await toast.present();
+      }
     });
     await modal.present();
+  }
+
+  loadPantryData() {
+    console.log('loadPantryData called');
+    const pantryData = this.firebaseService.getPantry();
+    console.log('Pantry data from service:', pantryData);
+    if (pantryData) {
+      this.editName = pantryData.name;
+      this.editNick = pantryData.nick;
+      console.log('Updated pantry display:', this.editName, this.editNick);
+    }
   }
 
   async deleteMyPantry() {

@@ -71,6 +71,38 @@ export class PantrySettingsModalComponent implements OnInit {
     this.isEditing = false;
   }
 
+  // async saveChanges() {
+  //   if (!this.editName.trim() || !this.editNick.trim()) {
+  //     this.showAlert('error', 'Name and nickname cannot be empty.');
+  //     return;
+  //   }
+  //   if (this.editNick !== this.currentNick) {
+  //     const nickTaken = await this.checkNicknameAvailability(this.editNick);
+  //     if (nickTaken) {
+  //       this.showAlert('error', 'This nickname is already taken.');
+  //       return;
+  //     }
+  //   }
+  //   try {
+  //     await this.firebaseService.updatePantryDetails(
+  //       this.editName,
+  //       this.editNick
+  //     );
+  //     console.log('Pantry updated, dismissing with updated: true');
+
+  //     //this.showAlert('success', 'Pantry updated successfully!');
+
+  //     this.modalController.dismiss({
+  //       updated: true,
+  //       name: this.editName,
+  //       nick: this.editNick,
+  //     });
+  //   } catch (error) {
+  //     console.error('Error updating pantry:', error);
+  //     this.showAlert('error', 'Failed to update pantry. Please try again.');
+  //   }
+  // }
+
   async saveChanges() {
     if (!this.editName.trim() || !this.editNick.trim()) {
       this.showAlert('error', 'Name and nickname cannot be empty.');
@@ -88,12 +120,12 @@ export class PantrySettingsModalComponent implements OnInit {
         this.editName,
         this.editNick
       );
+
       this.modalController.dismiss({
         updated: true,
         name: this.editName,
         nick: this.editNick,
       });
-      this.showAlert('success', 'Pantry updated successfully!');
     } catch (error) {
       console.error('Error updating pantry:', error);
       this.showAlert('error', 'Failed to update pantry. Please try again.');

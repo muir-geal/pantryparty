@@ -148,7 +148,7 @@ export class AddFoodModalComponent implements OnInit {
       openfoodfactsid: barcode, // Store the barcode as OpenFoodFacts ID
       expirationdate: product.expiration_date || '',
       amount: this.newAmount || 1,
-      available: this.newAmount || 1,
+      available: this.newAmount || 0,
       unit: '',
 
       // Dietary flags

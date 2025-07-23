@@ -426,6 +426,8 @@ export class FirebaseService {
         this.pantry.name = name;
         this.pantry.nick = nick;
       }
+      // await this.loadPantry();
+
       return true;
     } catch (error) {
       console.error('Error updating pantry:', error);

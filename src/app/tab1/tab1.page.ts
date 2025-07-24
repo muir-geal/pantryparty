@@ -132,4 +132,8 @@ export class Tab1Page {
   get nutrientCalorieBreakdown() {
     return this.nutritionService.nutrientCalorieBreakdown;
   }
+
+  getCalorieInfo(food: any) {
+    return this.nutritionService.getCalorieInfo(food);
+  }
 }

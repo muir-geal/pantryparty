@@ -37,7 +37,7 @@ export class Tab4Page {
 
   food: any = null;
   newName: string = '';
-  newRating: number = 5;
+  newRating: number = 0;
   notes: string = '';
   amount: number = 0;
   unit: string = '';
@@ -1331,5 +1331,9 @@ export class Tab4Page {
 
   getCalories(food: any): number {
     return this.nutritionService.getTotalCalories(food);
+  }
+
+  getCalorieInfo(food: any) {
+    return this.nutritionService.getCalorieInfo(food);
   }
 }

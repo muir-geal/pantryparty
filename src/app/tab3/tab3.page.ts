@@ -41,8 +41,11 @@ export class Tab3Page {
 
   isReserved: boolean = false;
 
-  ngOnInit() {
-    this.loadPantries();
+  // ngOnInit() {
+  //   this.loadPantries();
+
+  async ngOnInit() {
+    await this.loadPantries();
 
     // const identifier = this.food?.barcode || this.food?.openfoodfactsid;
     // if (identifier) {
@@ -55,19 +58,91 @@ export class Tab3Page {
     // }
   }
 
+  // async ionViewWillEnter() {
+  //   await this.loadPantries();
+  // }
+
+  // async loadPantries() {
+  //   const pantriesObs = this.firebaseService.getPantries();
+  //   pantriesObs.subscribe((pantries) => {
+  //     this.allPantries = pantries || [];
+  //     console.log('Sample pantry from Firebase:', this.allPantries[0]);
+  //     console.log(
+  //       'Sample food from Firebase:',
+  //       this.allPantries[0]?.foods?.[0]
+  //     );
+  //     this.filterPantries();
+  //     this.updateFilteredPantries();
+  //     this.loadReservedStates();
+  //   });
+  // }
+
   async loadPantries() {
     const pantriesObs = this.firebaseService.getPantries();
-    pantriesObs.subscribe((pantries) => {
+    pantriesObs.subscribe(async (pantries) => {
       this.allPantries = pantries || [];
       console.log('Sample pantry from Firebase:', this.allPantries[0]);
       console.log(
         'Sample food from Firebase:',
         this.allPantries[0]?.foods?.[0]
       );
+
+      // Process package info for all foods in all pantries
+      // await this.processAllFoodsPackageInfo();
+
       this.filterPantries();
       this.updateFilteredPantries();
       this.loadReservedStates();
     });
+  }
+
+  async processAllFoodsPackageInfo() {
+    // Process each pantry and its foods
+    for (const pantry of this.allPantries) {
+      if (pantry.foods && pantry.foods.length > 0) {
+        // Process foods in batches to avoid overwhelming the API
+        const batchSize = 5;
+        for (let i = 0; i < pantry.foods.length; i += batchSize) {
+          const batch = pantry.foods.slice(i, i + batchSize);
+          await Promise.all(
+            batch.map((food: any) => this.ensurePackageInfo(food))
+          );
+        }
+      }
+    }
+  }
+
+  async ensurePackageInfo(food: any) {
+    // If package info is missing but we have an OpenFoodFacts ID, fetch it
+    if ((!food.package_size || !food.package_unit) && food.openfoodfactsid) {
+      try {
+        const packageInfo = await this.fetchPackageInfoFromBarcode(
+          food.openfoodfactsid
+        );
+        if (packageInfo.size > 0) {
+          food.package_size = packageInfo.size;
+          food.package_unit = packageInfo.unit;
+
+          // Optionally update in database (uncomment if you want to persist changes)
+          // await this.firebaseService.updateFoodItem(food);
+        }
+      } catch (error) {
+        console.warn(`Failed to fetch package info for ${food.name}:`, error);
+      }
+    }
+
+    // Fallback: Use original amount/unit if no package info and no barcode
+    if ((!food.package_size || !food.package_unit) && !food.openfoodfactsid) {
+      food.package_size = food.amount || 0;
+      food.package_unit = food.unit || '';
+    }
+
+    // Ensure available is a number to fix display issues
+    if (food.available === undefined || food.available === null) {
+      food.available = 0;
+    } else {
+      food.available = Number(food.available);
+    }
   }
 
   loadReservedStates() {
@@ -349,6 +424,12 @@ export class Tab3Page {
   async openFoodDetail(food: any) {
     console.log('Opening food detail for:', food);
 
+    if (!food.package_size || !food.package_unit) {
+      const info = await this.fetchPackageInfoFromBarcode(food.openfoodfactsid);
+      food.package_size = info.size;
+      food.package_unit = info.unit;
+    }
+
     const modal = await this.modalController.create({
       component: OpenFoodDetailModalComponent,
       componentProps: { food },
@@ -513,5 +594,45 @@ export class Tab3Page {
       return '';
     }
     return item.allergens.join(', ');
+  }
+
+  // async fetchPackageInfoFromBarcode(
+  //   barcode: string
+  // ): Promise<{ size: number; unit: string }> {
+  //   const product = await this.firebaseService.fetchProductData(barcode);
+  //   if (!product || !product.quantity) return { size: 0, unit: '' };
+
+  //   // Example quantity strings: "500g", "1.5L"
+  //   const match = product.quantity.match(/^(\d+(?:\.\d+)?)\s*([a-zA-Z]+)$/);
+  //   if (match) {
+  //     return {
+  //       size: parseFloat(match[1]),
+  //       unit: match[2].toLowerCase(),
+  //     };
+  //   }
+
+  //   return { size: 0, unit: '' };
+  // }
+
+  async fetchPackageInfoFromBarcode(
+    barcode: string
+  ): Promise<{ size: number; unit: string }> {
+    const product = await this.firebaseService.fetchProductData(barcode);
+    if (!product || !product.quantity) return { size: 0, unit: '' };
+
+    // Example quantity strings: "500g", "1.5L"
+    const match = product.quantity.match(/^(\d+(?:\.\d+)?)\s*([a-zA-Z]+)$/);
+    if (match) {
+      return {
+        size: parseFloat(match[1]),
+        unit: match[2].toLowerCase(),
+      };
+    }
+
+    return { size: 0, unit: '' };
+  }
+
+  getCalorieInfo(food: any) {
+    return this.nutritionService.getCalorieInfo(food);
   }
 }

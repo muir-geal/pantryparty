@@ -14,17 +14,17 @@
   style="height: 100%; overflow: auto; font-size: 1.1em"
 >
   <div *ngIf="food">
-    <p>{{ food.amount }} {{ food.unit }}</p>
+    <p>{{ food.package_size }} {{ food.package_unit }}</p>
     <p *ngIf="food.available > 0">
-      {{ food.available }} {{ food.unit }} available for sharing
+      {{ food.available }} {{ food.package_unit }} available for sharing
     </p>
     <p *ngIf="!food.available || food.available == 0">
       not available for sharing
     </p>
     <div *ngIf="food.nutriments" style="border-top: 1px solid #ccc">
-      <p *ngIf="food.nutriments?.['energy-kcal'] && food.unit != 'pcs'">
+      <!--<p *ngIf="food.nutriments?.['energy-kcal'] && food.package_unit != 'pcs'">
         {{
-          (food.nutriments["energy-kcal"] * food.amount) / 100
+          (food.nutriments["energy-kcal"] * food.package_size) / 100
             | number : "1.0-0"
         }}
         calories left
@@ -35,52 +35,81 @@
       </p>
       <p *ngIf="food.nutriments?.['energy-kcal_serving']">
         {{ food.nutriments["energy-kcal_serving"] }} calories per serving
-      </p>
-      <p *ngIf="food.nutriments?.proteins && food.unit != 'pcs'">
-        <!-- IF PCS: only use /100g!!-->
-        protein:
-        {{ (food.nutriments.proteins * food.amount) / 100 | number : "1.0-0" }}g
-      </p>
-      <p *ngIf="food.nutriments?.fat && food.unit != 'pcs'">
-        fat:
-        {{ (food.nutriments.fat * food.amount) / 100 | number : "1.0-0" }}g
-      </p>
-      <p *ngIf="food.nutriments?.sugars && food.unit != 'pcs'">
-        sugar:
-        {{ (food.nutriments.sugars * food.amount) / 100 | number : "1.0-0" }}g
-      </p>
-      <p *ngIf="food.nutriments?.salt && food.unit != 'pcs'">
-        salt:
-        {{ (food.nutriments.salt * food.amount) / 100 | number : "1.0-0" }}g
-      </p>
-      <p *ngIf="food.nutriments?.carbohydrates && food.unit != 'pcs'">
-        carbohydrates:
-        {{
-          (food.nutriments.carbohydrates * food.amount) / 100
-            | number : "1.0-0"
-        }}g
-      </p>
-      <p *ngIf="food.nutriments?.proteins && food.unit == 'pcs'">
-        protein:
-        {{ food.nutriments.proteins }} / 100g
-      </p>
-      <p *ngIf="food.nutriments?.fat && food.unit == 'pcs'">
-        fat:
-        {{ food.nutriments.fat }} / 100g
-      </p>
-      <p *ngIf="food.nutriments?.sugars && food.unit == 'pcs'">
-        sugar:
-        {{ food.nutriments.sugars }} / 100g
-      </p>
-      <p *ngIf="food.nutriments?.salt && food.unit == 'pcs'">
-        salt:
-        {{ food.nutriments.salt * food.amount }} / 100g
-      </p>
-      <p *ngIf="food.nutriments?.carbohydrates && food.unit == 'pcs'">
-        carbohydrates:
-        {{ food.nutriments.carbohydrates * food.amount }} / 100g
-      </p>
+      </p>-->
+
+      <div *ngIf="getCalorieInfo(food) as calorieInfo">
+        <p>{{ calorieInfo.total }} calories total</p>
+        <p>{{ calorieInfo.per100g }} cal/100g</p>
+        <p *ngIf="calorieInfo.perServing !== calorieInfo.per100g">
+          {{ calorieInfo.perServing }} cal/serving
+        </p>
+      </div>
+
+      <div *ngIf="food.nutriments && food.package_unit != 'pcs'">
+        <p *ngIf="food.nutriments?.proteins">
+          {{
+            (food.nutriments.proteins * (food.package_size || food.amount)) /
+              100 | number : "1.0-0"
+          }}g protein
+        </p>
+        <p *ngIf="food.nutriments?.fat">
+          {{
+            (food.nutriments.fat * (food.package_size || food.amount)) / 100
+              | number : "1.0-0"
+          }}g fat
+        </p>
+        <p *ngIf="food.nutriments?.sugars">
+          {{
+            (food.nutriments.sugars * (food.package_size || food.amount)) / 100
+              | number : "1.0-0"
+          }}g sugar
+        </p>
+        <p *ngIf="food.nutriments?.salt">
+          {{
+            (food.nutriments.salt * (food.package_size || food.amount)) / 100
+              | number : "1.0-0"
+          }}g salt
+        </p>
+        <p *ngIf="food.nutriments?.carbohydrates">
+          {{
+            (food.nutriments.carbohydrates *
+              (food.package_size || food.amount)) /
+              100 | number : "1.0-0"
+          }}g carbohydrates
+        </p>
+      </div>
+
+      <div *ngIf="food.nutriments && food.package_unit == 'pcs'">
+        <p *ngIf="food.nutriments?.proteins">
+          {{ food.nutriments.proteins }} protein/100g
+        </p>
+        <p *ngIf="food.nutriments?.fat">{{ food.nutriments.fat }} fat/100g</p>
+        <p *ngIf="food.nutriments?.sugars">
+          {{ food.nutriments.sugars }} sugar/100g
+        </p>
+        <p *ngIf="food.nutriments?.salt">
+          {{ food.nutriments.salt * food.package_size }} salt/100g
+        </p>
+        <p *ngIf="food.nutriments?.carbohydrates">
+          {{ food.nutriments.carbohydrates * food.package_size }}
+          carbohydrates/100g
+        </p>
+      </div>
     </div>
+
+    <!--<div *ngIf="getNutrientList(food).length > 0" class="nutrient-legend">
+      <div
+        class="legend-item"
+        *ngFor="let nutrient of getNutrientList(food)"
+        [class.calorie-item]="nutrient.isCalorie"
+      >
+        <span class="legend-name">{{ nutrient.name }}</span>
+        <span class="legend-value">
+          {{ nutrient.value | number : "1.0-0" }}{{ nutrient.unit }}
+        </span>
+      </div>
+    </div>-->
+
     <div
       *ngIf="countAllergens(food) >= 0"
       style="

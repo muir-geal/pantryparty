@@ -20,8 +20,8 @@
     >
       <ion-select-option value="name">name</ion-select-option>
       <ion-select-option value="type">type</ion-select-option>
-      <ion-select-option value="energykcal">calories</ion-select-option>
-      <ion-select-option value="proteins">proteins</ion-select-option>
+      <ion-select-option value="energykcal">calories / 100g</ion-select-option>
+      <ion-select-option value="proteins">protein</ion-select-option>
       <ion-select-option value="allergens">allergens</ion-select-option>
       <ion-select-option value="rating">rating</ion-select-option>
       <ion-select-option value="expirationdate"
@@ -33,7 +33,10 @@
   <ion-card>
     <ion-accordion-group>
       @for(item of filteredPantries; track item.id) {
-      <ion-accordion value="{{ item.id }}">
+      <ion-accordion
+        value="{{ item.id }}"
+        (click)="processAllFoodsPackageInfo()"
+      >
         <ion-item slot="header" color="light">
           <ion-label>
             <h2>{{ item.name }} ({{ item.foods?.length || 0 }})</h2>
@@ -59,13 +62,18 @@
               />
             </ion-thumbnail>
             <ion-label>
-              {{ food.name }} ({{ food.amount }} {{ food.unit }})
-              <p *ngIf="food.nutriments?.['energy-kcal'] && food.unit == 'pcs'">
-                {{ food.nutriments?.['energy-kcal'] }} calories / 100g
+              {{ food.name }} ({{ food.package_size || food.amount }} {{
+              food.package_unit }})
+              <p
+                *ngIf="food.nutriments?.['energy-kcal'] && (food.package_unit || food.unit) == 'pcs'"
+              >
+                {{ food.nutriments?.['energy-kcal'] }} cal/100g
               </p>
-              <p *ngIf="food.nutriments?.['energy-kcal'] && food.unit != 'pcs'">
-                {{ (food.nutriments?.['energy-kcal'] * food.amount / 100) |
-                number:'1.0-0' }} calories
+              <p
+                *ngIf="food.nutriments?.['energy-kcal'] && (food.package_unit || food.unit) != 'pcs'"
+              >
+                {{ (food.nutriments?.['energy-kcal'] * food.package_size / 100)
+                | number:'1.0-0' }} calories
               </p>
             </ion-label>
             <ion-badge *ngIf="food.isReserved" slot="end" color="danger"

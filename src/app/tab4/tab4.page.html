@@ -83,13 +83,13 @@
               </ion-thumbnail>
               <ion-label>
                 <h2>{{ item.name }}</h2>
-                <div *ngIf="item.unit != 'pcs'">
+                <div *ngIf="item.package_unit != 'pcs'">
                   <p *ngIf="item.nutriments?.['energy-kcal']">
-                    {{ (item.nutriments['energy-kcal'] * item.amount / 100) |
-                    number:'1.0-0' }} calories
+                    {{ (item.nutriments['energy-kcal'] * item.package_size /
+                    100) | number:'1.0-0' }} calories
                   </p>
                 </div>
-                <div *ngIf="item.unit == 'pcs'">
+                <div *ngIf="item.package_unit == 'pcs'">
                   <p *ngIf="item.nutriments?.['energy-kcal']">
                     {{ item.nutriments['energy-kcal']}} calories / 100g
                   </p>
@@ -98,8 +98,14 @@
             </ion-item>
 
             <div class="ion-padding" slot="content" style="font-size: 1.1em">
-              <p>{{ item.amount }} {{ item.unit }}</p>
-              <p>{{ item.available }} {{ item.unit }} available for sharing</p>
+              <p>{{ item.package_size }} {{ item.package_unit }}</p>
+              <p>
+                {{ item.available }} {{ item.package_unit }} available for
+                sharing
+              </p>
+              <p *ngIf="!item.available || item.available == 0">
+                not available for sharing
+              </p>
 
               <!-- eventuell ngIf nochmal anpassen mit allen einzelnen Werten, falls das doch noch Probleme macht: -->
               <div
@@ -107,8 +113,8 @@
                 style="border-top: 1px solid #ccc; padding-top: 16px"
               >
                 <p *ngIf="item.nutriments?.['energy-kcal']">
-                  {{ (item.nutriments['energy-kcal'] * item.amount / 100) |
-                  number:'1.0-0' }} calories left
+                  {{ (item.nutriments['energy-kcal'] * item.package_size / 100)
+                  | number:'1.0-0' }} calories left
                 </p>
                 <p *ngIf="item.nutriments?.['energy-kcal']">
                   {{ item.nutriments['energy-kcal']}} calories / 100g
@@ -118,24 +124,24 @@
                   serving
                 </p>
                 <p *ngIf="item.nutriments?.proteins">
-                  protein: {{ (item.nutriments.proteins * item.amount) / 100 |
-                  number : "1.0-0" }}g
+                  protein: {{ (item.nutriments.proteins * item.package_size) /
+                  100 | number : "1.0-0" }}g
                 </p>
                 <p *ngIf="item.nutriments?.fat">
-                  fat: {{ (item.nutriments.fat * item.amount) / 100 | number :
-                  "1.0-0" }}g
+                  fat: {{ (item.nutriments.fat * item.package_size) / 100 |
+                  number : "1.0-0" }}g
                 </p>
                 <p *ngIf="item.nutriments?.sugars">
-                  sugar: {{ (item.nutriments.sugars * item.amount) / 100 |
+                  sugar: {{ (item.nutriments.sugars * item.package_size) / 100 |
                   number : "1.0-0" }}g
                 </p>
                 <p *ngIf="item.nutriments?.salt">
-                  salt: {{ (item.nutriments.salt * item.amount) / 100 | number :
-                  "1.0-0" }}g
+                  salt: {{ (item.nutriments.salt * item.package_size) / 100 |
+                  number : "1.0-0" }}g
                 </p>
                 <p *ngIf="item.nutriments?.carbohydrates">
                   carbohydrates: {{ (item.nutriments.carbohydrates *
-                  item.amount) / 100 | number : "1.0-0" }}g
+                  item.package_size) / 100 | number : "1.0-0" }}g
                 </p>
               </div>
 

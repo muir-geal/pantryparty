@@ -29,7 +29,9 @@
       >
         <ion-select-option value="pcs">pieces</ion-select-option>
         <ion-select-option value="g">grams</ion-select-option>
+        <ion-select-option value="kg">kilograms</ion-select-option>
         <ion-select-option value="ml">milliliters</ion-select-option>
+        <ion-select-option value="l">liters</ion-select-option>
       </ion-select>
     </ion-item>
 
@@ -60,6 +62,7 @@
     </ion-item>
 
     <ion-item>
+      <ion-label position="floating">type</ion-label>
       <ion-select
         [(ngModel)]="newType"
         interface="action-sheet"
@@ -80,7 +83,9 @@
     </ion-item>
 
     <ion-item>
-      <ion-label position="floating">available</ion-label>
+      <ion-label slot="end"
+        >{{ food.packageUnit }} available for sharing</ion-label
+      >
       <ion-input type="number" [(ngModel)]="newAvailable"></ion-input>
     </ion-item>
 

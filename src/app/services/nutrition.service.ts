@@ -69,23 +69,196 @@ export class NutritionService {
     }, 0);
   }
 
-  getTotalCalories(food: any): number {
-    const kcalPer100g = this.extractNutritionValue(food, 'energy');
-    const amount = food?.amount || 0;
-    const unit = food?.unit || 'g' || 'ml';
+  // getTotalCalories(food: any): number {
+  //   const kcalPer100g = this.extractNutritionValue(food, 'energy');
+  //   const amount = food?.amount || 0;
+  //   const unit = food?.unit || 'g' || 'ml';
 
-    // if g or ml
-    if (
-      unit === 'g' ||
-      unit === 'gram' ||
-      unit === 'ml' ||
-      unit === 'millilitres'
-    ) {
-      return Math.round((kcalPer100g * amount) / 100);
+  //   // if g or ml
+  //   if (
+  //     unit === 'g' ||
+  //     unit === 'gram' ||
+  //     unit === 'ml' ||
+  //     unit === 'millilitres'
+  //   ) {
+  //     return Math.round((kcalPer100g * amount) / 100);
+  //   }
+
+  //   // For units like pcs, assume kcalPer100g is already per unit
+  //   return Math.round(kcalPer100g * amount);
+  // }
+
+  getTotalCalories(food: any): number {
+    const kcalPer100g = this.getCaloriesPer100g(food);
+
+    if (kcalPer100g === 0) {
+      return 0;
     }
 
-    // For units like pcs, assume kcalPer100g is already per unit
+    // Determine the weight/amount to calculate from
+    const packageSize = food?.package_size || 0;
+    const packageUnit = (food?.package_unit || '').toLowerCase();
+    const amount = food?.amount || 0;
+    const unit = (food?.unit || 'g').toLowerCase();
+
+    // Use package info if available, otherwise fall back to amount/unit
+    const finalAmount = packageSize > 0 ? packageSize : amount;
+    const finalUnit = packageUnit || unit;
+
+    return this.calculateCaloriesFromAmount(
+      kcalPer100g,
+      finalAmount,
+      finalUnit
+    );
+  }
+
+  private calculateCaloriesFromAmount(
+    kcalPer100g: number,
+    amount: number,
+    unit: string
+  ): number {
+    if (amount === 0) {
+      return 0;
+    }
+
+    const normalizedUnit = unit.toLowerCase();
+
+    // Weight-based units (convert to grams)
+    if (this.isWeightUnit(normalizedUnit)) {
+      const weightInGrams = this.convertToGrams(amount, normalizedUnit);
+      return Math.round((kcalPer100g * weightInGrams) / 100);
+    }
+
+    // Volume-based units (assume 1ml = 1g density for most foods)
+    if (this.isVolumeUnit(normalizedUnit)) {
+      const weightInGrams = this.convertVolumeToGrams(amount, normalizedUnit);
+      return Math.round((kcalPer100g * weightInGrams) / 100);
+    }
+
+    // For pieces or unknown units, assume kcalPer100g is per unit
     return Math.round(kcalPer100g * amount);
+  }
+
+  getCaloriesPer100g(food: any): number {
+    // Try the new nested structure first
+    if (food.nutriments?.['energy-kcal_100g']) {
+      return food.nutriments['energy-kcal_100g'];
+    }
+
+    // Fallback to regular energy-kcal (assuming it's per 100g)
+    if (food.nutriments?.['energy-kcal']) {
+      return food.nutriments['energy-kcal'];
+    }
+
+    // Legacy fallback
+    return this.extractNutritionValue(food, 'energy') || 0;
+  }
+
+  getCaloriesPerServing(food: any): number {
+    if (food.nutriments?.['energy-kcal_serving']) {
+      return Math.round(food.nutriments['energy-kcal_serving']);
+    }
+
+    // If no serving data, return per 100g as fallback
+    return this.getCaloriesPer100g(food);
+  }
+
+  private isWeightUnit(unit: string): boolean {
+    return [
+      'g',
+      'gram',
+      'grams',
+      'kg',
+      'kilogram',
+      'kilograms',
+      'oz',
+      'ounce',
+      'ounces',
+      'lb',
+      'pound',
+      'pounds',
+    ].includes(unit);
+  }
+
+  private isVolumeUnit(unit: string): boolean {
+    return [
+      'ml',
+      'milliliter',
+      'milliliters',
+      'l',
+      'liter',
+      'liters',
+      'fl oz',
+      'cup',
+      'cups',
+      'pint',
+      'pints',
+      'quart',
+      'quarts',
+    ].includes(unit);
+  }
+
+  private convertToGrams(amount: number, unit: string): number {
+    switch (unit) {
+      case 'kg':
+      case 'kilogram':
+      case 'kilograms':
+        return amount * 1000;
+      case 'oz':
+      case 'ounce':
+      case 'ounces':
+        return amount * 28.35;
+      case 'lb':
+      case 'pound':
+      case 'pounds':
+        return amount * 453.592;
+      case 'g':
+      case 'gram':
+      case 'grams':
+      default:
+        return amount;
+    }
+  }
+
+  private convertVolumeToGrams(amount: number, unit: string): number {
+    // Assuming density similar to water (1ml = 1g) for most foods
+    switch (unit) {
+      case 'l':
+      case 'liter':
+      case 'liters':
+        return amount * 1000;
+      case 'fl oz':
+        return amount * 29.5735;
+      case 'cup':
+      case 'cups':
+        return amount * 240; // US cup
+      case 'pint':
+      case 'pints':
+        return amount * 473.176;
+      case 'quart':
+      case 'quarts':
+        return amount * 946.353;
+      case 'ml':
+      case 'milliliter':
+      case 'milliliters':
+      default:
+        return amount;
+    }
+  }
+
+  // Convenience method to get all calorie information at once
+  getCalorieInfo(food: any): {
+    per100g: number;
+    perServing: number;
+    total: number;
+    unit: string;
+  } {
+    return {
+      per100g: this.getCaloriesPer100g(food),
+      perServing: this.getCaloriesPerServing(food),
+      total: this.getTotalCalories(food),
+      unit: food?.package_unit || food?.unit || 'g',
+    };
   }
 
   async getEatenFoodsToday(): Promise<EatenFood[]> {

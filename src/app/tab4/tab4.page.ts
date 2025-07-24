@@ -15,6 +15,7 @@ import { NutritionService } from '../services/nutrition.service';
 import { EatenFood } from '../models/eaten-food';
 import { ManualFoodModalComponent } from '../modals/manual-food-modal/manual-food-modal.component';
 import { ToastController } from '@ionic/angular';
+import { LoadingController } from '@ionic/angular';
 
 @Component({
   selector: 'app-tab4',
@@ -69,7 +70,8 @@ export class Tab4Page {
     private alertController: AlertController,
     private nutritionService: NutritionService,
     private actionSheetController: ActionSheetController,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private loadingController: LoadingController
   ) {}
 
   // async ngOnInit() {

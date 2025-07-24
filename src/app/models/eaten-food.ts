@@ -1,7 +1,7 @@
 export interface BaseFood {
   name: string;
-  package_size: number;
-  package_unit: string;
+  // package_size: number;
+  // package_unit: string;
   amount: number;
   unit: string;
   type: string;
@@ -24,15 +24,15 @@ export interface Nutriments {
   fats: number;
   sugars: number;
   salts: number;
-  calcium_100g: number;
-  fiber_100g: number;
-  iron_100g: number;
-  magnesium_100g: number;
-  potassium_100g: number;
-  'vitamin-a_100g': number;
-  'vitamin-b12_100g': number;
-  'vitamin-c_100g': number;
-  'vitamin-d_100g': number;
+  // calcium_100g: number;
+  // fiber_100g: number;
+  // iron_100g: number;
+  // magnesium_100g: number;
+  // potassium_100g: number;
+  // 'vitamin-a_100g': number;
+  // 'vitamin-b12_100g': number;
+  // 'vitamin-c_100g': number;
+  // 'vitamin-d_100g': number;
 }
 
 export interface FoodItem extends BaseFood {

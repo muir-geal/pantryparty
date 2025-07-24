@@ -200,7 +200,7 @@ export class Tab4Page {
           icon: 'create-outline',
           role: 'manual',
           handler: () => {
-            this.openAddFoodModal();
+            this.openManualFoodModal();
           },
         },
         {
@@ -247,6 +247,27 @@ export class Tab4Page {
     }
   }
 
+  // async scanBarcode() {
+  //   document.body.classList.add('barcode-scanner-active');
+  //   this.scanListener = await BarcodeScanner.addListener(
+  //     'barcodesScanned',
+  //     async (event) => {
+  //       if (event.barcodes && event.barcodes.length > 0) {
+  //         const code = event.barcodes[0].displayValue;
+  //         this.scannedCode = code;
+
+  //         await BarcodeScanner.stopScan();
+  //         await this.scanListener.remove();
+  //         document.body.classList.remove('barcode-scanner-active');
+
+  //         this.addFoodByBarcode(code);
+  //       }
+  //     }
+  //   );
+  //   document.body.classList.add('barcode-scanner-active');
+  //   await BarcodeScanner.startScan();
+  // }
+
   async scanBarcode() {
     document.body.classList.add('barcode-scanner-active');
     this.scanListener = await BarcodeScanner.addListener(
@@ -268,49 +289,146 @@ export class Tab4Page {
     await BarcodeScanner.startScan();
   }
 
+  // async openAddFoodModalWithScan() {
+  //   this.isScanning = true;
+  //   document.body.classList.add('barcode-scanner-active');
+
+  //   const barcode = await this.scanSingleBarcode();
+  //   this.isScanning = false;
+
+  //   document.body.classList.remove('barcode-scanner-active');
+
+  //   if (!barcode) {
+  //     alert('No barcode scanned.');
+  //     return;
+  //   }
+
+  //   const food = await this.addFoodByBarcode(barcode);
+
+  //   if (!food) {
+  //     alert('Food not found for this barcode.');
+  //     return;
+  //   }
+
+  //   const pantry = await this.firebaseService.getPantry();
+  //   const existingItem = pantry?.foods?.find(
+  //     (item: any) => item.barcode === barcode
+  //   );
+
+  //   const modal = await this.modalController.create({
+  //     component: AddFoodModalComponent,
+  //     componentProps: { food },
+  //     cssClass: 'barcode-modal',
+  //   });
+
+  //   await modal.present();
+
+  //   const { data } = await modal.onDidDismiss();
+  //   if (data) {
+  //     const pantry = await this.firebaseService.getPantry();
+  //     if (pantry) {
+  //       await this.firebaseService.updatePantryWithFood(pantry.id, data);
+  //       this.loadPantryItems();
+  //     }
+  //   }
+  // }
+
   async openAddFoodModalWithScan() {
     this.isScanning = true;
     document.body.classList.add('barcode-scanner-active');
 
-    const barcode = await this.scanSingleBarcode();
-    this.isScanning = false;
+    try {
+      const barcode = await this.scanSingleBarcode();
 
-    document.body.classList.remove('barcode-scanner-active');
+      // Clean up scanner IMMEDIATELY after getting barcode (like older version)
+      this.isScanning = false;
+      document.body.classList.remove('barcode-scanner-active');
+      await BarcodeScanner.stopScan();
+      await BarcodeScanner.removeAllListeners();
 
-    if (!barcode) {
-      alert('No barcode scanned.');
-      return;
-    }
-
-    const food = await this.addFoodByBarcode(barcode);
-
-    if (!food) {
-      alert('Food not found for this barcode.');
-      return;
-    }
-
-    const pantry = await this.firebaseService.getPantry();
-    const existingItem = pantry?.foods?.find(
-      (item: any) => item.barcode === barcode
-    );
-
-    const modal = await this.modalController.create({
-      component: AddFoodModalComponent,
-      componentProps: { food },
-      cssClass: 'barcode-modal',
-    });
-
-    await modal.present();
-
-    const { data } = await modal.onDidDismiss();
-    if (data) {
-      const pantry = await this.firebaseService.getPantry();
-      if (pantry) {
-        await this.firebaseService.updatePantryWithFood(pantry.id, data);
-        this.loadPantryItems();
+      if (!barcode) {
+        alert('No barcode scanned.');
+        return;
       }
+
+      // Show loading state during heavy processing
+      const loading = await this.loadingController.create({
+        message: 'Looking up product...',
+        spinner: 'crescent',
+      });
+      await loading.present();
+
+      try {
+        const food = await this.addFoodByBarcode(barcode);
+
+        await loading.dismiss();
+
+        if (!food) {
+          alert('Food not found for this barcode.');
+          return;
+        }
+
+        const pantry = await this.firebaseService.getPantry();
+        const existingItem = pantry?.foods?.find(
+          (item: any) => item.openfoodfactsid === barcode
+        );
+
+        const modal = await this.modalController.create({
+          component: AddFoodModalComponent,
+          componentProps: { food },
+          cssClass: 'barcode-modal',
+        });
+
+        await modal.present();
+
+        const { data } = await modal.onDidDismiss();
+        if (data) {
+          const pantry = await this.firebaseService.getPantry();
+          if (pantry) {
+            await this.firebaseService.updatePantryWithFood(pantry.id, data);
+            this.loadPantryItems();
+          }
+        }
+      } catch (error) {
+        await loading.dismiss();
+        console.error('Error processing barcode:', error);
+        alert('Error processing product data. Please try again.');
+      }
+    } catch (error) {
+      // Clean up if scanning fails
+      this.isScanning = false;
+      document.body.classList.remove('barcode-scanner-active');
+      await BarcodeScanner.stopScan();
+      await BarcodeScanner.removeAllListeners();
+
+      console.error('Scanning failed:', error);
+      alert('Scanning failed. Please try again.');
     }
   }
+
+  // async scanSingleBarcode(): Promise<string | null> {
+  //   console.log('Starting barcode scan...');
+
+  //   return new Promise(async (resolve, reject) => {
+  //     try {
+  //       const listener = await BarcodeScanner.addListener(
+  //         'barcodesScanned',
+  //         async (event: any) => {
+  //           console.log('Barcode detected:', event.barcodes[0]?.rawValue);
+  //           await listener.remove();
+  //           resolve(event.barcodes[0]?.rawValue || null);
+  //         }
+  //       );
+
+  //       await BarcodeScanner.startScan();
+  //       console.log('BarcodeScanner.startScan() called');
+  //     } catch (err) {
+  //       console.error('Barcode scanning failed:', err);
+  //       reject(null);
+  //       this.isScanning = false;
+  //     }
+  //   });
+  // }
 
   async scanSingleBarcode(): Promise<string | null> {
     console.log('Starting barcode scan...');
@@ -386,6 +504,132 @@ export class Tab4Page {
   //   return food;
   // }
 
+  // async addFoodByBarcode(barcode: string): Promise<any | null> {
+  //   const product = await this.firebaseService.fetchProductData(barcode);
+  //   if (!product) {
+  //     alert('Product not found');
+  //     return null;
+  //   }
+
+  //   // Create food item with the comprehensive structure matching saveFood()
+  //   const food = {
+  //     ...this.firebaseService.createFoodItem(), // Start with the default structure
+
+  //     // Basic info
+  //     name: product.product_name || 'unknown',
+  //     type: '', // You might want to determine this from product categories
+  //     openfoodfactsid: barcode, // Store the barcode as OpenFoodFacts ID
+  //     expirationdate: product.expiration_date || '',
+  //     // package_size: this.food.package_size || 0,
+  //     // package_unit: this.food.package_unit || '',
+  //     amount: this.amount || 1,
+  //     available: this.amount || 0,
+  //     unit: '',
+
+  //     // Dietary flags
+  //     vegan: product.labels_tags?.includes('en:vegan') || false,
+  //     vegetarian: product.labels_tags?.includes('en:vegetarian') || false,
+  //     halal: product.labels_tags?.includes('en:halal') || false,
+  //     kosher: product.labels_tags?.includes('en:kosher') || false,
+
+  //     // Other properties
+  //     image: product.image_front_small_url || product.image_url || '',
+  //     allergens: (product.allergens_tags || []).map((a: string) =>
+  //       a.replace('en:', '')
+  //     ),
+  //     notes: this.notes || '',
+  //     rating: this.newRating || 0,
+
+  //     // Map nutrition data to the new structure
+  //     nutrition: {
+  //       fat: product.nutriments?.fat || 0,
+  //       'saturated-fat': product.nutriments?.['saturated-fat'] || 0,
+  //       salt: product.nutriments?.salt || 0,
+  //       sugar: product.nutriments?.sugars || 0,
+  //     },
+
+  //     // Map comprehensive nutriments data
+  //     nutriments: {
+  //       carbohydrates: product.nutriments?.carbohydrates || 0,
+  //       carbohydrates_100g: product.nutriments?.carbohydrates_100g || 0,
+  //       carbohydrates_serving: product.nutriments?.carbohydrates_serving || 0,
+  //       carbohydrates_unit: 'g',
+  //       carbohydrates_value: product.nutriments?.carbohydrates || 0,
+
+  //       energy: product.nutriments?.energy || 0,
+  //       'energy-kcal': product.nutriments?.['energy-kcal'] || 0,
+  //       'energy-kcal_100g': product.nutriments?.['energy-kcal_100g'] || 0,
+  //       'energy-kcal_serving': product.nutriments?.['energy-kcal_serving'] || 0,
+  //       'energy-kcal_unit': 'kcal',
+  //       'energy-kcal_value': product.nutriments?.['energy-kcal'] || 0,
+  //       'energy-kcal_value_computed':
+  //         product.nutriments?.['energy-kcal_value_computed'] || 0,
+  //       energy_100g: product.nutriments?.energy_100g || 0,
+  //       energy_serving: product.nutriments?.energy_serving || 0,
+  //       energy_unit: 'kcal',
+  //       energy_value: product.nutriments?.['energy-kcal'] || 0,
+
+  //       fat: product.nutriments?.fat || 0,
+  //       fat_100g: product.nutriments?.fat_100g || 0,
+  //       fat_serving: product.nutriments?.fat_serving || 0,
+  //       fat_unit: 'g',
+  //       fat_value: product.nutriments?.fat || 0,
+
+  //       proteins: product.nutriments?.proteins || 0,
+  //       proteins_100g: product.nutriments?.proteins_100g || 0,
+  //       proteins_serving: product.nutriments?.proteins_serving || 0,
+  //       proteins_unit: 'g',
+  //       proteins_value: product.nutriments?.proteins || 0,
+
+  //       salt: product.nutriments?.salt || 0,
+  //       salt_100g: product.nutriments?.salt_100g || 0,
+  //       salt_serving: product.nutriments?.salt_serving || 0,
+  //       salt_unit: 'g',
+  //       salt_value: product.nutriments?.salt || 0,
+
+  //       'saturated-fat': product.nutriments?.['saturated-fat'] || 0,
+  //       'saturated-fat_100g': product.nutriments?.['saturated-fat_100g'] || 0,
+  //       'saturated-fat_serving':
+  //         product.nutriments?.['saturated-fat_serving'] || 0,
+  //       'saturated-fat_unit': 'g',
+  //       'saturated-fat_value': product.nutriments?.['saturated-fat'] || 0,
+
+  //       sodium: product.nutriments?.sodium || 0,
+  //       sodium_100g: product.nutriments?.sodium_100g || 0,
+  //       sodium_serving: product.nutriments?.sodium_serving || 0,
+  //       sodium_unit: 'g',
+  //       sodium_value: product.nutriments?.sodium || 0,
+
+  //       sugars: product.nutriments?.sugars || 0,
+  //       sugars_100g: product.nutriments?.sugars_100g || 0,
+  //       sugars_serving: product.nutriments?.sugars_serving || 0,
+  //       sugars_unit: 'g',
+  //       sugars_value: product.nutriments?.sugars || 0,
+
+  //       // calcium_100g: product.nutriments_estimated?.calcium_100g || 0,
+  //       // fiber_100g: product.nutriments_estimated?.fiber_100g || 0,
+  //       // iron_100g: product.nutriments_estimated?.iron_100g || 0,
+  //       // magnesium_100g: product.nutriments_estimated?.magnesium_100g || 0,
+  //       // potassium_100g: product.nutriments_estimated?.potassium_100g || 0,
+  //       // 'vitamin-a_100g': product.nutriments_estimated?.['vitamin-a_100g'] || 0,
+  //       // 'vitamin-b12_100g':
+  //       //   product.nutriments_estimated?.['vitamin-b12_100g'] || 0,
+  //       // 'vitamin-c_100g': product.nutriments_estimated?.['vitamin-c_100g'] || 0,
+  //       // 'vitamin-d_100g': product.nutriments_estimated?.['vitamin-d_100g'] || 0,
+  //     },
+
+  //     // Use defaults from createFoodItem for nutriments_estimated
+  //     nutriments_estimated:
+  //       this.firebaseService.createFoodItem().nutriments_estimated,
+
+  //     // Environmental data (if available from OpenFoodFacts)
+  //     footprint_per_kg: product.footprint_per_kg || 0,
+  //     footprint_grade: product.footprint_grade || '',
+  //   };
+
+  //   return food;
+  // }
+
   async addFoodByBarcode(barcode: string): Promise<any | null> {
     const product = await this.firebaseService.fetchProductData(barcode);
     if (!product) {
@@ -402,8 +646,6 @@ export class Tab4Page {
       type: '', // You might want to determine this from product categories
       openfoodfactsid: barcode, // Store the barcode as OpenFoodFacts ID
       expirationdate: product.expiration_date || '',
-      package_size: this.food.package_size || 0,
-      package_unit: this.food.package_unit || '',
       amount: this.amount || 1,
       available: this.amount || 0,
       unit: '',
@@ -487,17 +729,6 @@ export class Tab4Page {
         sugars_serving: product.nutriments?.sugars_serving || 0,
         sugars_unit: 'g',
         sugars_value: product.nutriments?.sugars || 0,
-
-        calcium_100g: product.nutriments_estimated?.calcium_100g || 0,
-        fiber_100g: product.nutriments_estimated?.fiber_100g || 0,
-        iron_100g: product.nutriments_estimated?.iron_100g || 0,
-        magnesium_100g: product.nutriments_estimated?.magnesium_100g || 0,
-        potassium_100g: product.nutriments_estimated?.potassium_100g || 0,
-        'vitamin-a_100g': product.nutriments_estimated?.['vitamin-a_100g'] || 0,
-        'vitamin-b12_100g':
-          product.nutriments_estimated?.['vitamin-b12_100g'] || 0,
-        'vitamin-c_100g': product.nutriments_estimated?.['vitamin-c_100g'] || 0,
-        'vitamin-d_100g': product.nutriments_estimated?.['vitamin-d_100g'] || 0,
       },
 
       // Use defaults from createFoodItem for nutriments_estimated
@@ -511,6 +742,20 @@ export class Tab4Page {
 
     return food;
   }
+
+  // parseQuantity(quantityString: string) {
+  //   if (!quantityString) return { amount: 0, unit: '' };
+
+  //   // Extract number and unit from strings like "500g", "1.5L", "250ml"
+  //   const match = quantityString.match(/^(\d+(?:\.\d+)?)\s*([a-zA-Z]+)$/);
+  //   if (match) {
+  //     return {
+  //       amount: parseFloat(match[1]),
+  //       unit: match[2].toLowerCase(),
+  //     };
+  //   }
+  //   return { amount: 0, unit: quantityString }; // fallback
+  // }
 
   async openPantrySettings() {
     await this.firebaseService.loadPantry(); //WORKED, made the new name/nick refresh instantly within the modal
@@ -717,8 +962,8 @@ export class Tab4Page {
 
     const eatenFood: EatenFood = {
       name: this.food.name,
-      package_size: 0,
-      package_unit: '',
+      // package_size: 0,
+      // package_unit: '',
       amount: this.food.amount,
       unit: this.food.unit,
       type: this.food.type,
@@ -733,19 +978,19 @@ export class Tab4Page {
         carbohydrates: this.food.nutriments?.carbohydrates || 0,
         sugars: this.food.nutriments?.sugars || 0,
         salts: this.food.nutriments?.salts || 0,
-        calcium_100g: this.food.nutriments_estimated?.calcium_100g || 0,
-        fiber_100g: this.food.nutriments_estimated?.fiber_100g || 0,
-        iron_100g: this.food.nutriments_estimated?.iron_100g || 0,
-        magnesium_100g: this.food.nutriments_estimated?.magnesium_100g || 0,
-        potassium_100g: this.food.nutriments_estimated?.potassium_100g || 0,
-        'vitamin-a_100g':
-          this.food.nutriments_estimated?.['vitamin-a_100g'] || 0,
-        'vitamin-b12_100g':
-          this.food.nutriments_estimated?.['vitamin-b12_100g'] || 0,
-        'vitamin-c_100g':
-          this.food.nutriments_estimated?.['vitamin-c_100g'] || 0,
-        'vitamin-d_100g':
-          this.food.nutriments_estimated?.['vitamin-d_100g'] || 0,
+        // calcium_100g: this.food.nutriments_estimated?.calcium_100g || 0,
+        // fiber_100g: this.food.nutriments_estimated?.fiber_100g || 0,
+        // iron_100g: this.food.nutriments_estimated?.iron_100g || 0,
+        // magnesium_100g: this.food.nutriments_estimated?.magnesium_100g || 0,
+        // potassium_100g: this.food.nutriments_estimated?.potassium_100g || 0,
+        // 'vitamin-a_100g':
+        //   this.food.nutriments_estimated?.['vitamin-a_100g'] || 0,
+        // 'vitamin-b12_100g':
+        //   this.food.nutriments_estimated?.['vitamin-b12_100g'] || 0,
+        // 'vitamin-c_100g':
+        //   this.food.nutriments_estimated?.['vitamin-c_100g'] || 0,
+        // 'vitamin-d_100g':
+        //   this.food.nutriments_estimated?.['vitamin-d_100g'] || 0,
       },
       nutrition: {
         fat: this.food.nutrition?.fat || 0,

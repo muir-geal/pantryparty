@@ -34,7 +34,7 @@ export class AddFoodModalComponent implements OnInit {
 
   // Form fields
   newName: string = '';
-  newRating: number = 5;
+  newRating: number = 0;
   notes: string = '';
   newAmount: number = 1;
   newAvailable: number = 0;
@@ -86,7 +86,7 @@ export class AddFoodModalComponent implements OnInit {
     this.newUnit = this.food.unit || 'g';
     this.expirationdate = this.food.expirationdate || '';
     this.newNotes = this.food.notes || '';
-    this.newRating = this.food.rating ?? 5;
+    this.newRating = this.food.rating ?? 0;
 
     // Dietary flags
     this.vegan = this.food.vegan ?? false;

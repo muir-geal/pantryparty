@@ -96,9 +96,10 @@ export class Tab4Page {
   //   this.loadPantryItems();
   // }
 
-  ngOnInit() {
+  async ngOnInit() {
     // Initialize with current limit
     this.newDailyLimit = this.nutritionService.getDailyLimit();
+    // await this.firebaseService.deleteMyTestPantries('0');
   }
 
   async ionViewWillEnter() {
@@ -199,7 +200,7 @@ export class Tab4Page {
           icon: 'create-outline',
           role: 'manual',
           handler: () => {
-            this.openManualFoodModal();
+            this.openAddFoodModal();
           },
         },
         {
@@ -223,6 +224,27 @@ export class Tab4Page {
     });
 
     await modal.present();
+  }
+
+  async openAddFoodModal() {
+    const modal = await this.modalController.create({
+      component: AddFoodModalComponent,
+      cssClass: 'food-detail-modal',
+      componentProps: {
+        isEditing: false,
+        food: this.firebaseService.createFoodItem(),
+      },
+    });
+
+    await modal.present();
+    const { data } = await modal.onDidDismiss();
+    if (data) {
+      const pantry = await this.firebaseService.getPantry();
+      if (pantry) {
+        await this.firebaseService.updatePantryWithFood(pantry.id, data);
+        this.loadPantryItems();
+      }
+    }
   }
 
   async scanBarcode() {
@@ -380,6 +402,8 @@ export class Tab4Page {
       type: '', // You might want to determine this from product categories
       openfoodfactsid: barcode, // Store the barcode as OpenFoodFacts ID
       expirationdate: product.expiration_date || '',
+      package_size: this.food.package_size || 0,
+      package_unit: this.food.package_unit || '',
       amount: this.amount || 1,
       available: this.amount || 0,
       unit: '',
@@ -463,6 +487,17 @@ export class Tab4Page {
         sugars_serving: product.nutriments?.sugars_serving || 0,
         sugars_unit: 'g',
         sugars_value: product.nutriments?.sugars || 0,
+
+        calcium_100g: product.nutriments_estimated?.calcium_100g || 0,
+        fiber_100g: product.nutriments_estimated?.fiber_100g || 0,
+        iron_100g: product.nutriments_estimated?.iron_100g || 0,
+        magnesium_100g: product.nutriments_estimated?.magnesium_100g || 0,
+        potassium_100g: product.nutriments_estimated?.potassium_100g || 0,
+        'vitamin-a_100g': product.nutriments_estimated?.['vitamin-a_100g'] || 0,
+        'vitamin-b12_100g':
+          product.nutriments_estimated?.['vitamin-b12_100g'] || 0,
+        'vitamin-c_100g': product.nutriments_estimated?.['vitamin-c_100g'] || 0,
+        'vitamin-d_100g': product.nutriments_estimated?.['vitamin-d_100g'] || 0,
       },
 
       // Use defaults from createFoodItem for nutriments_estimated
@@ -682,6 +717,8 @@ export class Tab4Page {
 
     const eatenFood: EatenFood = {
       name: this.food.name,
+      package_size: 0,
+      package_unit: '',
       amount: this.food.amount,
       unit: this.food.unit,
       type: this.food.type,
@@ -696,6 +733,19 @@ export class Tab4Page {
         carbohydrates: this.food.nutriments?.carbohydrates || 0,
         sugars: this.food.nutriments?.sugars || 0,
         salts: this.food.nutriments?.salts || 0,
+        calcium_100g: this.food.nutriments_estimated?.calcium_100g || 0,
+        fiber_100g: this.food.nutriments_estimated?.fiber_100g || 0,
+        iron_100g: this.food.nutriments_estimated?.iron_100g || 0,
+        magnesium_100g: this.food.nutriments_estimated?.magnesium_100g || 0,
+        potassium_100g: this.food.nutriments_estimated?.potassium_100g || 0,
+        'vitamin-a_100g':
+          this.food.nutriments_estimated?.['vitamin-a_100g'] || 0,
+        'vitamin-b12_100g':
+          this.food.nutriments_estimated?.['vitamin-b12_100g'] || 0,
+        'vitamin-c_100g':
+          this.food.nutriments_estimated?.['vitamin-c_100g'] || 0,
+        'vitamin-d_100g':
+          this.food.nutriments_estimated?.['vitamin-d_100g'] || 0,
       },
       nutrition: {
         fat: this.food.nutrition?.fat || 0,

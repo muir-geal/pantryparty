@@ -31,6 +31,9 @@
         {{ food.nutriments["energy-kcal"] }}
         calories / 100g
       </p>
+      <p *ngIf="food.nutriments?.['energy-kcal_serving']">
+        {{ food.nutriments["energy-kcal_serving"] }} calories per serving
+      </p>
       <p *ngIf="food.nutriments?.proteins && food.unit != 'pcs'">
         <!-- IF PCS: only use /100g!!-->
         protein:

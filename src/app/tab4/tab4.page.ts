@@ -1014,9 +1014,94 @@ export class Tab4Page {
   //   await successAlert.present();
   // }
 
+  // async eatFoodItem(item: any) {
+  //   this.food = item;
+  //   console.log('Current food object:', this.food);
+  //   if (!this.food) {
+  //     const alert = await this.alertController.create({
+  //       header: 'missing food',
+  //       message: 'No food item was selected.',
+  //       buttons: ['OK'],
+  //     });
+  //     await alert.present();
+  //     return;
+  //   }
+
+  //   const energykcal = this.nutritionService.getTotalCalories(this.food);
+  //   if (energykcal <= 0) {
+  //     const alert = await this.alertController.create({
+  //       header: 'missing data',
+  //       message: 'No valid energy value is available for this food item.',
+  //       buttons: ['OK'],
+  //     });
+  //     await alert.present();
+  //     return;
+  //   }
+
+  //   const kcalPer100g = this.food.nutriments['energy-kcal_100g'] || 0;
+  //   const amount = this.food.amount || 0;
+  //   const totalKcal = (kcalPer100g * amount) / 100;
+
+  //   const eatenFood: EatenFood = {
+  //     name: this.food.name,
+  //     package_size: this.food.package_size || this.food.amount || 1,
+  //     package_unit: this.food.package_unit || this.food.unit || 'g',
+  //     amount: this.food.amount,
+  //     unit: this.food.unit,
+  //     type: this.food.type,
+  //     notes: this.food.notes,
+  //     rating: this.food.rating,
+  //     expirationdate: this.food.expirationdate,
+  //     timestamp: Date.now(),
+  //     nutriments: {
+  //       'energy-kcal': this.food.nutriments?.['energy-kcal'] || 0,
+  //       proteins: this.food.nutriments?.proteins || 0,
+  //       fats: this.food.nutriments?.fats || 0,
+  //       carbohydrates: this.food.nutriments?.carbohydrates || 0,
+  //       sugars: this.food.nutriments?.sugars || 0,
+  //       salts: this.food.nutriments?.salts || 0,
+  //       calcium_100g: this.food.nutriments_estimated?.calcium_100g || 0,
+  //       fiber_100g: this.food.nutriments_estimated?.fiber_100g || 0,
+  //       iron_100g: this.food.nutriments_estimated?.iron_100g || 0,
+  //       magnesium_100g: this.food.nutriments_estimated?.magnesium_100g || 0,
+  //       potassium_100g: this.food.nutriments_estimated?.potassium_100g || 0,
+  //       'vitamin-a_100g':
+  //         this.food.nutriments_estimated?.['vitamin-a_100g'] || 0,
+  //       'vitamin-b12_100g':
+  //         this.food.nutriments_estimated?.['vitamin-b12_100g'] || 0,
+  //       'vitamin-c_100g':
+  //         this.food.nutriments_estimated?.['vitamin-c_100g'] || 0,
+  //       'vitamin-d_100g':
+  //         this.food.nutriments_estimated?.['vitamin-d_100g'] || 0,
+  //     },
+  //     nutrition: {
+  //       fat: this.food.nutrition?.fat || 0,
+  //       'saturated-fat': this.food.nutrition?.['saturated-fat'] || 0,
+  //       salt: this.food.nutrition?.salt || 0,
+  //       sugar: this.food.nutrition?.sugar || 0,
+  //     },
+  //   };
+
+  //   console.log('Original food sent to logFood:', this.food);
+
+  //   // console.log('TEST food going to Firestore:', eatenFood);
+  //   // console.log('TEST food going to Firestore:', this.food);
+  //   // await this.firebaseService.logEatenFood(eatenFood);
+  //   // await this.firebaseService.logEatenFood(this.food);
+
+  //   await this.nutritionService.logFood(this.food);
+  //   const successAlert = await this.alertController.create({
+  //     header: 'success',
+  //     message: `"${this.food.name}" was added to your food log!`,
+  //     buttons: ['OK'],
+  //   });
+  //   await successAlert.present();
+  // }
+
   async eatFoodItem(item: any) {
     this.food = item;
     console.log('Current food object:', this.food);
+
     if (!this.food) {
       const alert = await this.alertController.create({
         header: 'missing food',
@@ -1038,64 +1123,16 @@ export class Tab4Page {
       return;
     }
 
-    const kcalPer100g = this.food.nutriments['energy-kcal_100g'] || 0;
-    const amount = this.food.amount || 0;
-    const totalKcal = (kcalPer100g * amount) / 100;
-
-    const eatenFood: EatenFood = {
-      name: this.food.name,
-      package_size: 0,
-      package_unit: '',
-      amount: this.food.amount,
-      unit: this.food.unit,
-      type: this.food.type,
-      notes: this.food.notes,
-      rating: this.food.rating,
-      expirationdate: this.food.expirationdate,
-      timestamp: Date.now(),
-      nutriments: {
-        'energy-kcal': this.food.nutriments?.['energy-kcal'] || 0,
-        proteins: this.food.nutriments?.proteins || 0,
-        fats: this.food.nutriments?.fats || 0,
-        carbohydrates: this.food.nutriments?.carbohydrates || 0,
-        sugars: this.food.nutriments?.sugars || 0,
-        salts: this.food.nutriments?.salts || 0,
-        calcium_100g: this.food.nutriments_estimated?.calcium_100g || 0,
-        fiber_100g: this.food.nutriments_estimated?.fiber_100g || 0,
-        iron_100g: this.food.nutriments_estimated?.iron_100g || 0,
-        magnesium_100g: this.food.nutriments_estimated?.magnesium_100g || 0,
-        potassium_100g: this.food.nutriments_estimated?.potassium_100g || 0,
-        'vitamin-a_100g':
-          this.food.nutriments_estimated?.['vitamin-a_100g'] || 0,
-        'vitamin-b12_100g':
-          this.food.nutriments_estimated?.['vitamin-b12_100g'] || 0,
-        'vitamin-c_100g':
-          this.food.nutriments_estimated?.['vitamin-c_100g'] || 0,
-        'vitamin-d_100g':
-          this.food.nutriments_estimated?.['vitamin-d_100g'] || 0,
-      },
-      nutrition: {
-        fat: this.food.nutrition?.fat || 0,
-        'saturated-fat': this.food.nutrition?.['saturated-fat'] || 0,
-        salt: this.food.nutrition?.salt || 0,
-        sugar: this.food.nutrition?.sugar || 0,
-      },
-    };
-
-    console.log('Original food sent to logFood:', this.food);
-
-    // console.log('TEST food going to Firestore:', eatenFood);
-    // console.log('TEST food going to Firestore:', this.food);
-    // await this.firebaseService.logEatenFood(eatenFood);
-    // await this.firebaseService.logEatenFood(this.food);
-
+    // Call the NutritionService to handle construction and logging
     await this.nutritionService.logFood(this.food);
-    const successAlert = await this.alertController.create({
-      header: 'success',
-      message: `"${this.food.name}" was added to your food log!`,
-      buttons: ['OK'],
+
+    // Optional: show confirmation
+    const toast = await this.toastController.create({
+      message: 'Food logged as eaten.',
+      duration: 2000,
+      color: 'success',
     });
-    await successAlert.present();
+    toast.present();
   }
 
   // filterMyPantry() {

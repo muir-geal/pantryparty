@@ -41,41 +41,46 @@
         <p>{{ calorieInfo.total }} calories total</p>
         <p>{{ calorieInfo.per100g }} cal/100g</p>
         <p *ngIf="calorieInfo.perServing !== calorieInfo.per100g">
-          {{ calorieInfo.perServing }} cal/serving
+          {{ calorieInfo.perServing }} calories per serving
         </p>
       </div>
 
       <div *ngIf="food.nutriments && food.package_unit != 'pcs'">
         <p *ngIf="food.nutriments?.proteins">
+          protein:
           {{
             (food.nutriments.proteins * (food.package_size || food.amount)) /
               100 | number : "1.0-0"
-          }}g protein
+          }}g
         </p>
         <p *ngIf="food.nutriments?.fat">
+          fat:
           {{
             (food.nutriments.fat * (food.package_size || food.amount)) / 100
               | number : "1.0-0"
-          }}g fat
+          }}g
         </p>
         <p *ngIf="food.nutriments?.sugars">
+          sugar:
           {{
             (food.nutriments.sugars * (food.package_size || food.amount)) / 100
               | number : "1.0-0"
-          }}g sugar
+          }}g
         </p>
         <p *ngIf="food.nutriments?.salt">
+          salt:
           {{
             (food.nutriments.salt * (food.package_size || food.amount)) / 100
               | number : "1.0-0"
-          }}g salt
+          }}g
         </p>
         <p *ngIf="food.nutriments?.carbohydrates">
+          carbohydrates:
           {{
             (food.nutriments.carbohydrates *
               (food.package_size || food.amount)) /
               100 | number : "1.0-0"
-          }}g carbohydrates
+          }}g
         </p>
       </div>
 

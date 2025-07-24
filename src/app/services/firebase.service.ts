@@ -618,6 +618,11 @@ export class FirebaseService {
     } catch (err) {
       console.error('Failed to log eaten food:', err);
     }
+
+    console.log(
+      'Actually saving to Firestore:',
+      eatenFoods[eatenFoods.length - 1]
+    );
   }
 
   async checkIfNickExists(nick: string): Promise<boolean> {

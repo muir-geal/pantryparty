@@ -4,7 +4,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<!--<ion-content>
   <ion-card>
     <ion-accordion-group>
       <ion-accordion
@@ -15,7 +15,7 @@
           <ion-label>
             week of {{ week.weekStart }}
             <p>{{ week.totalCalories }} total calories</p>
-            <!--should be same amount as {{ consumedToday }} -->
+            should be same amount as {{ consumedToday }}
           </ion-label>
         </ion-item>
         <ion-list slot="content">
@@ -29,4 +29,130 @@
       </ion-accordion>
     </ion-accordion-group>
   </ion-card>
+</ion-content>-->
+
+<ion-content>
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <ion-spinner></ion-spinner>
+    <p>Loading weekly data...</p>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading">
+    <!-- Week Navigation -->
+    <ion-card class="week-navigation">
+      <ion-card-content>
+        <div class="nav-container">
+          <ion-button
+            fill="clear"
+            size="small"
+            [disabled]="currentWeekIndex === 0"
+            (click)="previousWeek()"
+          >
+            <ion-icon name="chevron-back"></ion-icon>
+          </ion-button>
+
+          <div class="week-info" *ngIf="currentWeek">
+            <h3>Week {{ currentWeek.weekNumber }}</h3>
+            <p>
+              {{ formatDateRange(currentWeek.weekStart, currentWeek.weekEnd) }}
+            </p>
+          </div>
+
+          <ion-button
+            fill="clear"
+            size="small"
+            [disabled]="currentWeekIndex === weeks.length - 1"
+            (click)="nextWeek()"
+          >
+            <ion-icon name="chevron-forward"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Week Summary -->
+    <ion-card class="week-summary" *ngIf="currentWeek">
+      <ion-card-header>
+        <ion-card-title>Week Summary</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="summary-stats">
+          <div class="stat-item">
+            <div class="stat-value">{{ currentWeek.totalCalories }}</div>
+            <div class="stat-label">Total Calories</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">{{ currentWeek.averageCalories }}</div>
+            <div class="stat-label">Daily Average</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">{{ getDailyLimit() }}</div>
+            <div class="stat-label">Daily Target</div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Daily Breakdown -->
+    <ion-card class="daily-breakdown" *ngIf="currentWeek">
+      <ion-card-header>
+        <ion-card-title>Daily Breakdown</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="day-list">
+          <div
+            class="day-item"
+            *ngFor="let day of currentWeek.days"
+            [class.today]="day.isToday"
+            [class.under]="getCalorieStatus(day.calories) === 'under'"
+            [class.over]="getCalorieStatus(day.calories) === 'over'"
+            [class.good]="getCalorieStatus(day.calories) === 'good'"
+            [class.no-data]="getCalorieStatus(day.calories) === 'no-data'"
+          >
+            <div class="day-info">
+              <div class="day-name">
+                {{ day.dayName }}
+                <ion-badge *ngIf="day.isToday" color="primary">Today</ion-badge>
+              </div>
+              <div class="day-date">{{ formatDate(day.date) }}</div>
+            </div>
+
+            <div class="day-calories">
+              <div class="calories-value">
+                {{ day.calories > 0 ? day.calories : '--' }}
+              </div>
+              <div class="calories-label">calories</div>
+            </div>
+
+            <div class="day-progress">
+              <div class="progress-bar">
+                <div
+                  class="progress-fill"
+                  [style.width.%]="Math.min((day.calories / getDailyLimit()) * 100, 100)"
+                ></div>
+              </div>
+              <div class="progress-percent">
+                {{ day.calories > 0 ? Math.round((day.calories /
+                getDailyLimit()) * 100) : 0 }}%
+              </div>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Weekly Trends (if you want to add this later) -->
+    <!--
+    <ion-card class="weekly-trends">
+      <ion-card-header>
+        <ion-card-title>Trends</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p>Weekly trends and insights can be added here</p>
+      </ion-card-content>
+    </ion-card>
+    -->
+  </div>
 </ion-content>

@@ -19,6 +19,24 @@ export class Tab1Page {
   //  this.loadCaloriesConsumedToday();
   // }
 
+  // async ionViewWillEnter() {
+  //   const savedId = localStorage.getItem('pantryId');
+  //   if (!savedId) {
+  //     this.clearLocalData();
+  //     return;
+  //   }
+  //   this.firebaseService.pantryId = savedId;
+  //   await this.firebaseService.loadPantry();
+
+  //   const pantry = this.firebaseService.getPantry();
+  //   if (!pantry) {
+  //     this.clearLocalData();
+  //     localStorage.removeItem('pantryId');
+  //     return;
+  //   }
+  //   this.loadCaloriesConsumedToday();
+  // }
+
   async ionViewWillEnter() {
     const savedId = localStorage.getItem('pantryId');
     if (!savedId) {
@@ -34,7 +52,9 @@ export class Tab1Page {
       localStorage.removeItem('pantryId');
       return;
     }
-    this.loadCaloriesConsumedToday();
+
+    // Always refresh the data when entering the tab
+    await this.loadCaloriesConsumedToday();
   }
 
   private clearLocalData() {
@@ -48,9 +68,12 @@ export class Tab1Page {
       await this.nutritionService.getCaloriesConsumedToday();
     this.nutritionService.eatenToday =
       await this.nutritionService.getEatenFoodsToday();
+
+    // Force change detection if needed
+    // this.cdr.detectChanges(); // uncomment if you inject ChangeDetectorRef
   }
 
-  get caloriesConsumedTOday() {
+  get caloriesConsumedToday() {
     return this.nutritionService.getCaloriesConsumedToday();
   }
 
@@ -64,10 +87,6 @@ export class Tab1Page {
 
   get consumedToday(): number {
     return this.nutritionService.consumedToday;
-  }
-
-  get caloriesConsumedToday() {
-    return this.nutritionService.getCaloriesConsumedToday();
   }
 
   get dailyLimit(): number {

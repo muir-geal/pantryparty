@@ -15,7 +15,29 @@ export class NutritionService {
   }
 
   async logFood(food: EatenFood): Promise<void> {
-    await this.firebaseService.logEatenFood(food);
+    const eatenFood: EatenFood = {
+      ...food,
+      timestamp: Date.now(),
+      package_size:
+        typeof food.package_size === 'number' && food.package_size > 0
+          ? food.package_size
+          : food.amount > 0
+          ? food.amount
+          : 1,
+      package_unit: food.package_unit || food.unit || 'g',
+      amount: food.amount || 1,
+      unit: food.unit || 'g',
+      nutriments: food.nutriments || {},
+      nutrition: food.nutrition || {},
+      notes: food.notes || '',
+      rating: food.rating ?? 0,
+      expirationdate: food.expirationdate || '',
+      type: food.type || '',
+    };
+
+    console.log('Saving eaten food:', eatenFood);
+
+    await this.firebaseService.logEatenFood(eatenFood);
   }
 
   setDailyLimit(limit: number): void {
@@ -89,9 +111,14 @@ export class NutritionService {
   // }
 
   getTotalCalories(food: any): number {
+    console.log('=== DEBUG getTotalCalories ===');
+    console.log('Food object:', food);
+
     const kcalPer100g = this.getCaloriesPer100g(food);
+    console.log('kcalPer100g:', kcalPer100g);
 
     if (kcalPer100g === 0) {
+      console.log('kcalPer100g is 0, returning 0');
       return 0;
     }
 
@@ -101,15 +128,27 @@ export class NutritionService {
     const amount = food?.amount || 0;
     const unit = (food?.unit || 'g').toLowerCase();
 
+    console.log('packageSize:', packageSize);
+    console.log('packageUnit:', packageUnit);
+    console.log('amount:', amount);
+    console.log('unit:', unit);
+
     // Use package info if available, otherwise fall back to amount/unit
     const finalAmount = packageSize > 0 ? packageSize : amount;
     const finalUnit = packageUnit || unit;
 
-    return this.calculateCaloriesFromAmount(
+    console.log('finalAmount:', finalAmount);
+    console.log('finalUnit:', finalUnit);
+
+    const result = this.calculateCaloriesFromAmount(
       kcalPer100g,
       finalAmount,
       finalUnit
     );
+    console.log('Final result:', result);
+    console.log('=== END DEBUG ===');
+
+    return result;
   }
 
   private calculateCaloriesFromAmount(
@@ -140,18 +179,27 @@ export class NutritionService {
   }
 
   getCaloriesPer100g(food: any): number {
-    // Try the new nested structure first
-    if (food.nutriments?.['energy-kcal_100g']) {
-      return food.nutriments['energy-kcal_100g'];
-    }
+    console.log('=== DEBUG getCaloriesPer100g ===');
+    console.log('food.nutriments:', food.nutriments);
 
-    // Fallback to regular energy-kcal (assuming it's per 100g)
-    if (food.nutriments?.['energy-kcal']) {
-      return food.nutriments['energy-kcal'];
-    }
+    // Try different possible keys for energy values
+    const energyKcal100g = food.nutriments?.['energy-kcal_100g'] || 0;
+    const energyKcal = food.nutriments?.['energy-kcal'] || 0;
+    const energy100g = food.nutriments?.['energy_100g'] || 0;
+    const energy = food.nutriments?.energy || 0;
 
-    // Legacy fallback
-    return this.extractNutritionValue(food, 'energy') || 0;
+    console.log('energy-kcal_100g:', energyKcal100g);
+    console.log('energy-kcal:', energyKcal);
+    console.log('energy_100g:', energy100g);
+    console.log('energy:', energy);
+
+    // Return the first non-zero value found
+    const result =
+      energyKcal100g || energyKcal || energy100g / 4.184 || energy / 4.184;
+    console.log('getCaloriesPer100g result:', result);
+    console.log('=== END DEBUG getCaloriesPer100g ===');
+
+    return result;
   }
 
   getCaloriesPerServing(food: any): number {
@@ -421,5 +469,37 @@ export class NutritionService {
       },
       { proteins: 0, carbohydrates: 0, fats: 0, sugars: 0, salts: 0 }
     );
+  }
+
+  async getCaloriesConsumedForDateFromTimestamps(date: Date): Promise<number> {
+    try {
+      const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      const pantry = this.firebaseService.getPantry();
+      if (!pantry || !pantry.eatenFoods) {
+        return 0;
+      }
+
+      let totalCalories = 0;
+
+      // Iterate through all eaten foods and filter by date
+      for (const food of pantry.eatenFoods) {
+        if (food.timestamp) {
+          const foodDate = new Date(food.timestamp);
+          if (foodDate >= startOfDay && foodDate <= endOfDay) {
+            totalCalories += this.getTotalCalories(food);
+          }
+        }
+      }
+
+      return totalCalories;
+    } catch (error) {
+      console.error('Error getting calories for date from timestamps:', error);
+      return 0;
+    }
   }
 }

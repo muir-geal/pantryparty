@@ -43,6 +43,10 @@ export class AddFoodModalComponent implements OnInit {
   newNotes: string = '';
   expirationdate: string = '';
 
+  // Package info
+  packageSize: number = 0;
+  packageUnit: string = '';
+
   // Nutrition fields
   energykcal: number | null = null;
   proteins: number | null = null;
@@ -50,6 +54,17 @@ export class AddFoodModalComponent implements OnInit {
   sugars: number | null = null;
   salts: number | null = null;
   carbohydrates: number | null = null;
+  saturatedFat: number | null = null;
+  calcium: number | null = null;
+  sodium: number | null = null;
+  iron: number | null = null;
+  fiber: number | null = null;
+  magnesium: number | null = null;
+  potassium: number | null = null;
+  vitamin_a: number | null = null;
+  vitamin_b12: number | null = null;
+  vitamin_c: number | null = null;
+  vitamin_d: number | null = null;
 
   // Dietary flags
   vegan: boolean = false;
@@ -75,18 +90,34 @@ export class AddFoodModalComponent implements OnInit {
     }
   }
 
+  parseQuantity(quantityString: string) {
+    if (!quantityString) return { amount: 0, unit: '' };
+
+    // Extract number and unit from strings like "500g", "1.5L", "250ml"
+    const match = quantityString.match(/^(\d+(?:\.\d+)?)\s*([a-zA-Z]+)$/);
+    if (match) {
+      return {
+        amount: parseFloat(match[1]),
+        unit: match[2].toLowerCase(),
+      };
+    }
+    return { amount: 0, unit: quantityString }; // fallback
+  }
+
   private initializeFormFields() {
     if (!this.food) return;
 
     // Basic info
     this.newName = this.food.name || '';
     this.newType = this.food.type || 'other';
-    this.newAmount = this.food.amount ?? 1;
-    this.newAvailable = this.food.available ?? this.newAmount;
+    this.newAmount = Number(this.food.amount) ?? 1;
+    this.newAvailable = Number(this.food.available) ?? this.newAmount;
     this.newUnit = this.food.unit || 'g';
+    this.packageSize = Number(this.food.package_size) ?? 0;
+    this.packageUnit = this.food.package_unit || '';
     this.expirationdate = this.food.expirationdate || '';
     this.newNotes = this.food.notes || '';
-    this.newRating = this.food.rating ?? 0;
+    this.newRating = Number(this.food.rating) ?? 0;
 
     // Dietary flags
     this.vegan = this.food.vegan ?? false;
@@ -94,28 +125,48 @@ export class AddFoodModalComponent implements OnInit {
     this.halal = this.food.halal ?? false;
     this.kosher = this.food.kosher ?? false;
 
-    // Initialize nutrition fields from different possible sources
+    // Initialize nutrition fields from the nutriments object
     if (this.food.nutriments) {
-      // From comprehensive nutriments object (barcode scanned food)
       this.energykcal = this.food.nutriments['energy-kcal'] ?? null;
       this.proteins = this.food.nutriments.proteins ?? null;
       this.fats = this.food.nutriments.fat ?? null;
       this.sugars = this.food.nutriments.sugars ?? null;
       this.salts = this.food.nutriments.salt ?? null;
       this.carbohydrates = this.food.nutriments.carbohydrates ?? null;
-    } else if (this.food.nutrition) {
-      // From simplified nutrition object
-      this.fats = this.food.nutrition.fat ?? null;
-      this.salts = this.food.nutrition.salt ?? null;
-      this.sugars = this.food.nutrition.sugar ?? null;
+      this.saturatedFat = this.food.nutriments['saturated-fat'] ?? null;
+      this.sodium = this.food.nutriments.sodium ?? null;
+      this.calcium = this.food.nutriments_estimated?.calcium_100g ?? null;
+      this.fiber = this.food.nutriments_estimated?.fiber_100g ?? null;
+      this.iron = this.food.nutriments_estimated?.iron_100g ?? null;
+      this.magnesium = this.food.nutriments_estimated?.magnesium_100g ?? null;
+      this.potassium = this.food.nutriments_estimated?.potassium_100g ?? null;
+      this.vitamin_a =
+        this.food.nutriments_estimated?.['vitamin-a_100g'] ?? null;
+      this.vitamin_b12 =
+        this.food.nutriments_estimated?.['vitamin-b12_100g'] ?? null;
+      this.vitamin_c =
+        this.food.nutriments_estimated?.['vitamin-c_100g'] ?? null;
+      this.vitamin_d =
+        this.food.nutriments_estimated?.['vitamin-d_100g'] ?? null;
     } else {
-      // From legacy flat structure or manual input
-      this.energykcal = this.food.energykcal ?? null;
-      this.proteins = this.food.proteins ?? null;
-      this.fats = this.food.fats ?? null;
-      this.sugars = this.food.sugars ?? null;
-      this.salts = this.food.salts ?? null;
-      this.carbohydrates = this.food.carbohydrates ?? null;
+      // Initialize with null values for new items
+      this.energykcal = null;
+      this.proteins = null;
+      this.fats = null;
+      this.sugars = null;
+      this.salts = null;
+      this.carbohydrates = null;
+      this.saturatedFat = null;
+      this.sodium = null;
+      this.calcium = null;
+      this.fiber = null;
+      this.iron = null;
+      this.magnesium = null;
+      this.potassium = null;
+      this.vitamin_a = null;
+      this.vitamin_b12 = null;
+      this.vitamin_c = null;
+      this.vitamin_d = null;
     }
   }
 
@@ -138,18 +189,23 @@ export class AddFoodModalComponent implements OnInit {
       return null;
     }
 
+    // Parse package quantity if available
+    const packageInfo = this.parseQuantity(product.quantity || '');
+
     // Create food item with the comprehensive structure
     const food = {
       ...this.firebaseService.createFoodItem(), // Start with the default structure
 
       // Basic info
       name: product.product_name || 'unknown',
-      type: '', // You might want to determine this from product categories
+      type: this.newType || '', // Use form value or determine from categories
       openfoodfactsid: barcode, // Store the barcode as OpenFoodFacts ID
-      expirationdate: product.expiration_date || '',
+      expirationdate: this.expirationdate || product.expiration_date || '',
+      package_size: packageInfo.amount || 0,
+      package_unit: packageInfo.unit || '',
       amount: this.newAmount || 1,
-      available: this.newAmount || 0,
-      unit: '',
+      available: this.newAvailable || this.newAmount || 0,
+      unit: packageInfo.unit || this.newUnit || '',
 
       // Dietary flags
       vegan: product.labels_tags?.includes('en:vegan') || false,
@@ -162,7 +218,7 @@ export class AddFoodModalComponent implements OnInit {
       allergens: (product.allergens_tags || []).map((a: string) =>
         a.replace('en:', '')
       ),
-      notes: this.notes || '',
+      notes: this.newNotes || '',
       rating: this.newRating || 0,
 
       // Map nutrition data to the new structure
@@ -230,6 +286,16 @@ export class AddFoodModalComponent implements OnInit {
         sugars_serving: product.nutriments?.sugars_serving || 0,
         sugars_unit: 'g',
         sugars_value: product.nutriments?.sugars || 0,
+
+        calcium: this.food.nutriments_estimated?.calcium_100g || 0,
+        fiber: this.food.nutriments_estimated?.fiber_100g || 0,
+        iron: this.food.nutriments_estimated?.iron_100g || 0,
+        magnesium: this.food.nutriments_estimated?.magnesium_100g || 0,
+        potassium: this.food.nutriments_estimated?.potassium_100g || 0,
+        vitamin_a: this.food.nutriments_estimated?.['vitamin-a_100g'] || 0,
+        vitamin_b12: this.food.nutriments_estimated?.['vitamin-b12_100g'] || 0,
+        vitamin_c: this.food.nutriments_estimated?.['vitamin-c_100g'] || 0,
+        vitamin_d: this.food.nutriments_estimated?.['vitamin-d_100g'] || 0,
       },
 
       // Use defaults from createFoodItem for nutriments_estimated
@@ -259,8 +325,10 @@ export class AddFoodModalComponent implements OnInit {
       type: this.newType || '',
       openfoodfactsid: this.food.openfoodfactsid || '',
       expirationdate: this.expirationdate || '',
-      amount: this.newAmount || 1,
-      available: this.newAvailable || 0,
+      package_size: Number(this.packageSize) || 0,
+      package_unit: this.packageUnit || '',
+      amount: Number(this.newAmount) || 1,
+      available: Number(this.newAvailable) || 0,
       unit: this.newUnit || '',
 
       // Dietary flags
@@ -273,75 +341,84 @@ export class AddFoodModalComponent implements OnInit {
       image: this.food.image || '',
       allergens: this.food.allergens || [],
       notes: this.newNotes || '',
-      rating: this.newRating || 0,
+      rating: Number(this.newRating) || 0,
 
       // Map nutrition data to the new structure
       nutrition: {
-        fat: this.fats || 0,
-        'saturated-fat': this.food.nutrition?.['saturated-fat'] || 0,
-        salt: this.salts || 0,
-        sugar: this.sugars || 0,
+        fat: Number(this.fats) || 0,
+        'saturated-fat': Number(this.saturatedFat) || 0,
+        salt: Number(this.salts) || 0,
+        sugar: Number(this.sugars) || 0,
       },
 
-      // Map nutriments data
+      // Map nutriments data - preserve existing 100g and serving values when available
       nutriments: {
-        carbohydrates: this.carbohydrates || 0,
+        carbohydrates: Number(this.carbohydrates) || 0,
         carbohydrates_100g: this.food.nutriments?.carbohydrates_100g || 0,
         carbohydrates_serving: this.food.nutriments?.carbohydrates_serving || 0,
         carbohydrates_unit: 'g',
-        carbohydrates_value: this.carbohydrates || 0,
+        carbohydrates_value: Number(this.carbohydrates) || 0,
 
         energy: this.food.nutriments?.energy || 0,
-        'energy-kcal': this.energykcal || 0,
+        'energy-kcal': Number(this.energykcal) || 0,
         'energy-kcal_100g': this.food.nutriments?.['energy-kcal_100g'] || 0,
         'energy-kcal_serving':
           this.food.nutriments?.['energy-kcal_serving'] || 0,
         'energy-kcal_unit': 'kcal',
-        'energy-kcal_value': this.energykcal || 0,
+        'energy-kcal_value': Number(this.energykcal) || 0,
         'energy-kcal_value_computed':
           this.food.nutriments?.['energy-kcal_value_computed'] || 0,
         energy_100g: this.food.nutriments?.energy_100g || 0,
         energy_serving: this.food.nutriments?.energy_serving || 0,
         energy_unit: 'kcal',
-        energy_value: this.energykcal || 0,
+        energy_value: Number(this.energykcal) || 0,
 
-        fat: this.fats || 0,
+        fat: Number(this.fats) || 0,
         fat_100g: this.food.nutriments?.fat_100g || 0,
         fat_serving: this.food.nutriments?.fat_serving || 0,
         fat_unit: 'g',
-        fat_value: this.fats || 0,
+        fat_value: Number(this.fats) || 0,
 
-        proteins: this.proteins || 0,
+        proteins: Number(this.proteins) || 0,
         proteins_100g: this.food.nutriments?.proteins_100g || 0,
         proteins_serving: this.food.nutriments?.proteins_serving || 0,
         proteins_unit: 'g',
-        proteins_value: this.proteins || 0,
+        proteins_value: Number(this.proteins) || 0,
 
-        salt: this.salts || 0,
+        salt: Number(this.salts) || 0,
         salt_100g: this.food.nutriments?.salt_100g || 0,
         salt_serving: this.food.nutriments?.salt_serving || 0,
         salt_unit: 'g',
-        salt_value: this.salts || 0,
+        salt_value: Number(this.salts) || 0,
 
-        'saturated-fat': this.food.nutriments?.['saturated-fat'] || 0,
+        'saturated-fat': Number(this.saturatedFat) || 0,
         'saturated-fat_100g': this.food.nutriments?.['saturated-fat_100g'] || 0,
         'saturated-fat_serving':
           this.food.nutriments?.['saturated-fat_serving'] || 0,
         'saturated-fat_unit': 'g',
-        'saturated-fat_value':
-          this.food.nutriments?.['saturated-fat_value'] || 0,
+        'saturated-fat_value': Number(this.saturatedFat) || 0,
 
-        sodium: this.food.nutriments?.sodium || 0,
+        sodium: Number(this.sodium) || 0,
         sodium_100g: this.food.nutriments?.sodium_100g || 0,
         sodium_serving: this.food.nutriments?.sodium_serving || 0,
         sodium_unit: 'g',
-        sodium_value: this.food.nutriments?.sodium_value || 0,
+        sodium_value: Number(this.sodium) || 0,
 
-        sugars: this.sugars || 0,
+        sugars: Number(this.sugars) || 0,
         sugars_100g: this.food.nutriments?.sugars_100g || 0,
         sugars_serving: this.food.nutriments?.sugars_serving || 0,
         sugars_unit: 'g',
-        sugars_value: this.sugars || 0,
+        sugars_value: Number(this.sugars) || 0,
+
+        calcium: this.food.nutriments_estimated?.calcium_100g || 0,
+        fiber: this.food.nutriments_estimated?.fiber_100g || 0,
+        iron: this.food.nutriments_estimated?.iron_100g || 0,
+        magnesium: this.food.nutriments_estimated?.magnesium_100g || 0,
+        potassium: this.food.nutriments_estimated?.potassium_100g || 0,
+        vitamin_a: this.food.nutriments_estimated?.['vitamin-a_100g'] || 0,
+        vitamin_b12: this.food.nutriments_estimated?.['vitamin-b12_100g'] || 0,
+        vitamin_c: this.food.nutriments_estimated?.['vitamin-c_100g'] || 0,
+        vitamin_d: this.food.nutriments_estimated?.['vitamin-d_100g'] || 0,
       },
 
       // Keep existing nutriments_estimated or use defaults

@@ -274,8 +274,8 @@ export class FirebaseService {
       type: '',
       openfoodfactsid: '',
       expirationdate: '',
-      // package_size: 0,
-      // package_unit: '',
+      package_size: 0,
+      package_unit: '',
       amount: 1, //delete?
       available: 0,
       unit: '', //delete?

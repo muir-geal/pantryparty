@@ -138,6 +138,59 @@ export class Tab3Page {
   //     .filter(Boolean);
   // }
 
+  // filterPantries() {
+  //   const term = this.searchTerm.toLowerCase().trim();
+
+  //   if (!term) {
+  //     this.filteredPantries = [...this.allPantries];
+  //     return;
+  //   }
+
+  //   this.filteredPantries = this.allPantries
+  //     .map((pantry) => {
+  //       const matchingFoods = (pantry.foods || []).filter((food: any) =>
+  //         [
+  //           food.name,
+  //           food.amount ? `amount ${food.amount}` : '',
+  //           food.available ? `available ${food.available}` : '',
+  //           food.expirationdate,
+  //           food.notes,
+  //           food.type,
+  //           food.unit,
+  //           food.vegan ? 'vegan' : '',
+  //           food.vegetarian ? 'vegetarian' : '',
+  //           food.halal ? 'halal' : '',
+  //           food.kosher ? 'kosher' : '',
+
+  //           // Updated to use the new nested structure
+  //           food.nutriments?.['energy-kcal']
+  //             ? `calories ${food.nutriments['energy-kcal']}`
+  //             : '',
+  //           food.nutriments?.proteins
+  //             ? `proteins ${food.nutriments.proteins}`
+  //             : '',
+  //           food.nutriments?.fat ? `fats ${food.nutriments.fat}` : '',
+  //           food.nutriments?.sugars ? `sugars ${food.nutriments.sugars}` : '',
+  //           food.nutriments?.salt ? `salt ${food.nutriments.salt}` : '',
+  //           food.nutriments?.carbohydrates
+  //             ? `carbohydrates ${food.nutriments.carbohydrates}`
+  //             : '',
+
+  //           // Additional searchable fields from your new structure
+  //           food.allergens ? food.allergens.join(' ') : '',
+  //           food.openfoodfactsid ? food.openfoodfactsid : '',
+  //         ]
+  //           .filter(Boolean)
+  //           .some((field) => field.toLowerCase().includes(term))
+  //       );
+
+  //       return matchingFoods.length > 0
+  //         ? { ...pantry, foods: matchingFoods }
+  //         : null;
+  //     })
+  //     .filter(Boolean);
+  // }
+
   filterPantries() {
     const term = this.searchTerm.toLowerCase().trim();
 
@@ -157,28 +210,53 @@ export class Tab3Page {
             food.notes,
             food.type,
             food.unit,
+            food.package_unit,
+            food.package_size ? `package ${food.package_size}` : '',
             food.vegan ? 'vegan' : '',
             food.vegetarian ? 'vegetarian' : '',
             food.halal ? 'halal' : '',
             food.kosher ? 'kosher' : '',
 
-            // Updated to use the new nested structure
+            // Updated to use the new nested nutriments structure
             food.nutriments?.['energy-kcal']
               ? `calories ${food.nutriments['energy-kcal']}`
+              : '',
+            food.nutriments?.['energy-kcal_100g']
+              ? `calories100g ${food.nutriments['energy-kcal_100g']}`
               : '',
             food.nutriments?.proteins
               ? `proteins ${food.nutriments.proteins}`
               : '',
+            food.nutriments?.proteins_100g
+              ? `proteins100g ${food.nutriments.proteins_100g}`
+              : '',
             food.nutriments?.fat ? `fats ${food.nutriments.fat}` : '',
+            food.nutriments?.fat_100g
+              ? `fats100g ${food.nutriments.fat_100g}`
+              : '',
             food.nutriments?.sugars ? `sugars ${food.nutriments.sugars}` : '',
+            food.nutriments?.sugars_100g
+              ? `sugars100g ${food.nutriments.sugars_100g}`
+              : '',
             food.nutriments?.salt ? `salt ${food.nutriments.salt}` : '',
+            food.nutriments?.salt_100g
+              ? `salt100g ${food.nutriments.salt_100g}`
+              : '',
             food.nutriments?.carbohydrates
               ? `carbohydrates ${food.nutriments.carbohydrates}`
               : '',
+            food.nutriments?.carbohydrates_100g
+              ? `carbohydrates100g ${food.nutriments.carbohydrates_100g}`
+              : '',
+            food.nutriments?.['saturated-fat']
+              ? `saturatedfat ${food.nutriments['saturated-fat']}`
+              : '',
+            food.nutriments?.sodium ? `sodium ${food.nutriments.sodium}` : '',
 
             // Additional searchable fields from your new structure
             food.allergens ? food.allergens.join(' ') : '',
             food.openfoodfactsid ? food.openfoodfactsid : '',
+            food.footprint_grade ? `footprint ${food.footprint_grade}` : '',
           ]
             .filter(Boolean)
             .some((field) => field.toLowerCase().includes(term))
@@ -189,6 +267,79 @@ export class Tab3Page {
           : null;
       })
       .filter(Boolean);
+  }
+
+  sortFoods(foods: any[]) {
+    if (!foods || foods.length === 0) return [];
+
+    return [...foods].sort((a, b) => {
+      switch (this.sortOption) {
+        case 'name':
+          return (a.name || '').localeCompare(b.name || '');
+
+        case 'type':
+          // First sort by type, then by name as secondary sort
+          const typeCompare = (a.type || '').localeCompare(b.type || '');
+          return typeCompare !== 0
+            ? typeCompare
+            : (a.name || '').localeCompare(b.name || '');
+
+        case 'proteins':
+          // Updated to use the new nested structure
+          const proteinsA = a.nutriments?.proteins || 0;
+          const proteinsB = b.nutriments?.proteins || 0;
+          return proteinsB - proteinsA;
+
+        case 'energykcal':
+          // Updated to use the new nested structure
+          const energyA = a.nutriments?.['energy-kcal'] || 0;
+          const energyB = b.nutriments?.['energy-kcal'] || 0;
+          return energyB - energyA;
+
+        case 'rating':
+          return (b.rating || 0) - (a.rating || 0);
+
+        case 'expirationdate':
+          const dateA = a.expirationdate
+            ? new Date(a.expirationdate)
+            : new Date('9999-12-31');
+          const dateB = b.expirationdate
+            ? new Date(b.expirationdate)
+            : new Date('9999-12-31');
+          return dateA.getTime() - dateB.getTime();
+
+        case 'allergens':
+          const allergenCountA = this.countAllergens(a);
+          const allergenCountB = this.countAllergens(b);
+          const allergenCompare = allergenCountB - allergenCountA;
+          return allergenCompare !== 0
+            ? allergenCompare
+            : (a.name || '').localeCompare(b.name || '');
+
+        case 'allergens_asc':
+          const allergenCountA_asc = this.countAllergens(a);
+          const allergenCountB_asc = this.countAllergens(b);
+          const allergenCompare_asc = allergenCountA_asc - allergenCountB_asc;
+          return allergenCompare_asc !== 0
+            ? allergenCompare_asc
+            : (a.name || '').localeCompare(b.name || '');
+
+        // Additional sorting options for new structure
+        case 'package_size':
+          return (b.package_size || 0) - (a.package_size || 0);
+
+        case 'available':
+          return (b.available || 0) - (a.available || 0);
+
+        case 'footprint':
+          const footprintA = a.footprint_per_kg || 0;
+          const footprintB = b.footprint_per_kg || 0;
+          return footprintA - footprintB; // Lower footprint first
+
+        default:
+          return 0;
+      }
+    });
   }
 
   getPantries() {
@@ -245,60 +396,60 @@ export class Tab3Page {
     await modal.present();
   }
 
-  sortFoods(foods: any[]) {
-    if (!foods || foods.length === 0) return [];
+  // sortFoods(foods: any[]) {
+  //   if (!foods || foods.length === 0) return [];
 
-    return [...foods].sort((a, b) => {
-      switch (this.sortOption) {
-        case 'name':
-          return (a.name || '').localeCompare(b.name || '');
+  //   return [...foods].sort((a, b) => {
+  //     switch (this.sortOption) {
+  //       case 'name':
+  //         return (a.name || '').localeCompare(b.name || '');
 
-        case 'type':
-          // First sort by type, then by name as secondary sort
-          const typeCompare = (a.type || '').localeCompare(b.type || '');
-          return typeCompare !== 0
-            ? typeCompare
-            : (a.name || '').localeCompare(b.name || '');
+  //       case 'type':
+  //         // First sort by type, then by name as secondary sort
+  //         const typeCompare = (a.type || '').localeCompare(b.type || '');
+  //         return typeCompare !== 0
+  //           ? typeCompare
+  //           : (a.name || '').localeCompare(b.name || '');
 
-        case 'proteins':
-          return (b.proteins || 0) - (a.proteins || 0);
+  //       case 'proteins':
+  //         return (b.proteins || 0) - (a.proteins || 0);
 
-        case 'energykcal':
-          return (b.energykcal || 0) - (a.energykcal || 0);
+  //       case 'energykcal':
+  //         return (b.energykcal || 0) - (a.energykcal || 0);
 
-        case 'rating':
-          return (b.rating || 0) - (a.rating || 0);
+  //       case 'rating':
+  //         return (b.rating || 0) - (a.rating || 0);
 
-        case 'expirationdate':
-          const dateA = a.expirationdate
-            ? new Date(a.expirationdate)
-            : new Date('9999-12-31');
-          const dateB = b.expirationdate
-            ? new Date(b.expirationdate)
-            : new Date('9999-12-31');
-          return dateA.getTime() - dateB.getTime();
+  //       case 'expirationdate':
+  //         const dateA = a.expirationdate
+  //           ? new Date(a.expirationdate)
+  //           : new Date('9999-12-31');
+  //         const dateB = b.expirationdate
+  //           ? new Date(b.expirationdate)
+  //           : new Date('9999-12-31');
+  //         return dateA.getTime() - dateB.getTime();
 
-        case 'allergens':
-          const allergenCountA = this.countAllergens(a);
-          const allergenCountB = this.countAllergens(b);
-          const allergenCompare = allergenCountB - allergenCountA;
-          return allergenCompare !== 0
-            ? allergenCompare
-            : (a.name || '').localeCompare(b.name || '');
+  //       case 'allergens':
+  //         const allergenCountA = this.countAllergens(a);
+  //         const allergenCountB = this.countAllergens(b);
+  //         const allergenCompare = allergenCountB - allergenCountA;
+  //         return allergenCompare !== 0
+  //           ? allergenCompare
+  //           : (a.name || '').localeCompare(b.name || '');
 
-        case 'allergens_asc':
-          const allergenCountA_asc = this.countAllergens(a);
-          const allergenCountB_asc = this.countAllergens(b);
-          const allergenCompare_asc = allergenCountA_asc - allergenCountB_asc;
-          return allergenCompare_asc !== 0
-            ? allergenCompare_asc
-            : (a.name || '').localeCompare(b.name || '');
+  //       case 'allergens_asc':
+  //         const allergenCountA_asc = this.countAllergens(a);
+  //         const allergenCountB_asc = this.countAllergens(b);
+  //         const allergenCompare_asc = allergenCountA_asc - allergenCountB_asc;
+  //         return allergenCompare_asc !== 0
+  //           ? allergenCompare_asc
+  //           : (a.name || '').localeCompare(b.name || '');
 
-        default:
-          return 0;
-      }
-    });
-  }
+  //       default:
+  //         return 0;
+  //     }
+  //   });
+  // }
 
   sortPantries(pantries: any[]) {
     if (!pantries || pantries.length === 0) return [];
@@ -337,7 +488,7 @@ export class Tab3Page {
 
           return {
             ...pantry,
-            foods: sortedItems, // ← fix here too
+            foods: sortedItems,
           };
         })
         .filter(

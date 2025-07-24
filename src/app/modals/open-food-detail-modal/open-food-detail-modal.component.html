@@ -18,7 +18,9 @@
     <p *ngIf="food.available > 0">
       {{ food.available }} {{ food.unit }} available for sharing
     </p>
-    <p *ngIf="food.available == 0">not available for sharing</p>
+    <p *ngIf="!food.available || food.available == 0">
+      not available for sharing
+    </p>
     <div *ngIf="food.nutriments" style="border-top: 1px solid #ccc">
       <p *ngIf="food.nutriments?.['energy-kcal'] && food.unit != 'pcs'">
         {{

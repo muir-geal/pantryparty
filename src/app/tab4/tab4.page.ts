@@ -200,7 +200,7 @@ export class Tab4Page {
           icon: 'create-outline',
           role: 'manual',
           handler: () => {
-            this.openManualFoodModal();
+            this.openAddFoodModal();
           },
         },
         {
@@ -637,6 +637,9 @@ export class Tab4Page {
       return null;
     }
 
+    // Parse package quantity if available
+    const packageInfo = this.parseQuantity(product.quantity || '');
+
     // Create food item with the comprehensive structure matching saveFood()
     const food = {
       ...this.firebaseService.createFoodItem(), // Start with the default structure
@@ -646,9 +649,11 @@ export class Tab4Page {
       type: '', // You might want to determine this from product categories
       openfoodfactsid: barcode, // Store the barcode as OpenFoodFacts ID
       expirationdate: product.expiration_date || '',
+      package_size: packageInfo.amount || this.food.package_size || 0,
+      package_unit: packageInfo.unit || this.food.package_unit || '',
       amount: this.amount || 1,
       available: this.amount || 0,
-      unit: '',
+      unit: packageInfo.unit || '',
 
       // Dietary flags
       vegan: product.labels_tags?.includes('en:vegan') || false,
@@ -743,19 +748,19 @@ export class Tab4Page {
     return food;
   }
 
-  // parseQuantity(quantityString: string) {
-  //   if (!quantityString) return { amount: 0, unit: '' };
+  parseQuantity(quantityString: string) {
+    if (!quantityString) return { amount: 0, unit: '' };
 
-  //   // Extract number and unit from strings like "500g", "1.5L", "250ml"
-  //   const match = quantityString.match(/^(\d+(?:\.\d+)?)\s*([a-zA-Z]+)$/);
-  //   if (match) {
-  //     return {
-  //       amount: parseFloat(match[1]),
-  //       unit: match[2].toLowerCase(),
-  //     };
-  //   }
-  //   return { amount: 0, unit: quantityString }; // fallback
-  // }
+    // Extract number and unit from strings like "500g", "1.5L", "250ml"
+    const match = quantityString.match(/^(\d+(?:\.\d+)?)\s*([a-zA-Z]+)$/);
+    if (match) {
+      return {
+        amount: parseFloat(match[1]),
+        unit: match[2].toLowerCase(),
+      };
+    }
+    return { amount: 0, unit: quantityString }; // fallback
+  }
 
   async openPantrySettings() {
     await this.firebaseService.loadPantry(); //WORKED, made the new name/nick refresh instantly within the modal
@@ -962,8 +967,8 @@ export class Tab4Page {
 
     const eatenFood: EatenFood = {
       name: this.food.name,
-      // package_size: 0,
-      // package_unit: '',
+      package_size: 0,
+      package_unit: '',
       amount: this.food.amount,
       unit: this.food.unit,
       type: this.food.type,
@@ -978,19 +983,19 @@ export class Tab4Page {
         carbohydrates: this.food.nutriments?.carbohydrates || 0,
         sugars: this.food.nutriments?.sugars || 0,
         salts: this.food.nutriments?.salts || 0,
-        // calcium_100g: this.food.nutriments_estimated?.calcium_100g || 0,
-        // fiber_100g: this.food.nutriments_estimated?.fiber_100g || 0,
-        // iron_100g: this.food.nutriments_estimated?.iron_100g || 0,
-        // magnesium_100g: this.food.nutriments_estimated?.magnesium_100g || 0,
-        // potassium_100g: this.food.nutriments_estimated?.potassium_100g || 0,
-        // 'vitamin-a_100g':
-        //   this.food.nutriments_estimated?.['vitamin-a_100g'] || 0,
-        // 'vitamin-b12_100g':
-        //   this.food.nutriments_estimated?.['vitamin-b12_100g'] || 0,
-        // 'vitamin-c_100g':
-        //   this.food.nutriments_estimated?.['vitamin-c_100g'] || 0,
-        // 'vitamin-d_100g':
-        //   this.food.nutriments_estimated?.['vitamin-d_100g'] || 0,
+        calcium_100g: this.food.nutriments_estimated?.calcium_100g || 0,
+        fiber_100g: this.food.nutriments_estimated?.fiber_100g || 0,
+        iron_100g: this.food.nutriments_estimated?.iron_100g || 0,
+        magnesium_100g: this.food.nutriments_estimated?.magnesium_100g || 0,
+        potassium_100g: this.food.nutriments_estimated?.potassium_100g || 0,
+        'vitamin-a_100g':
+          this.food.nutriments_estimated?.['vitamin-a_100g'] || 0,
+        'vitamin-b12_100g':
+          this.food.nutriments_estimated?.['vitamin-b12_100g'] || 0,
+        'vitamin-c_100g':
+          this.food.nutriments_estimated?.['vitamin-c_100g'] || 0,
+        'vitamin-d_100g':
+          this.food.nutriments_estimated?.['vitamin-d_100g'] || 0,
       },
       nutrition: {
         fat: this.food.nutrition?.fat || 0,
@@ -1043,6 +1048,106 @@ export class Tab4Page {
   //   });
   // }
 
+  // filterMyPantry() {
+  //   const term = this.searchTerm.toLowerCase().trim();
+
+  //   if (!term) {
+  //     this.filteredFoods = [...this.allFoods];
+  //     return;
+  //   }
+
+  //   this.filteredFoods = (this.allFoods || []).filter((food: any) => {
+  //     const searchFields = [
+  //       food.name,
+  //       food.type,
+  //       food.notes,
+  //       food.unit,
+  //       food.vegan ? 'vegan' : '',
+  //       food.vegetarian ? 'vegetarian' : '',
+  //       food.halal ? 'halal' : '',
+  //       food.kosher ? 'kosher' : '',
+  //       food.amount ? `amount ${food.amount}` : '',
+  //       food.available ? `available ${food.available}` : '',
+
+  //       // Updated to use the new nested structure
+  //       food.nutriments?.['energy-kcal']
+  //         ? `calories ${food.nutriments['energy-kcal']}`
+  //         : '',
+  //       food.nutriments?.proteins ? `proteins ${food.nutriments.proteins}` : '',
+  //       food.nutriments?.fat ? `fats ${food.nutriments.fat}` : '',
+  //       food.nutriments?.sugars ? `sugars ${food.nutriments.sugars}` : '',
+  //       food.nutriments?.salt ? `salt ${food.nutriments.salt}` : '',
+  //       food.nutriments?.carbohydrates
+  //         ? `carbohydrates ${food.nutriments.carbohydrates}`
+  //         : '',
+
+  //       // Also include allergens in search
+  //       food.allergens ? food.allergens.join(' ') : '',
+
+  //       // Include OpenFoodFacts ID for barcode searches
+  //       food.openfoodfactsid ? food.openfoodfactsid : '',
+  //     ]
+  //       .filter(Boolean)
+  //       .join(' ');
+
+  //     return searchFields.toLowerCase().includes(term);
+  //   });
+  // }
+
+  // sortFoods(foods: any[]) {
+  //   if (!foods || foods.length === 0) return [];
+
+  //   return [...foods].sort((a, b) => {
+  //     switch (this.sortOption) {
+  //       case 'name':
+  //         return (a.name || '').localeCompare(b.name || '');
+
+  //       case 'type':
+  //         const typeCompare = (a.type || '').localeCompare(b.type || '');
+  //         return typeCompare !== 0
+  //           ? typeCompare
+  //           : (a.name || '').localeCompare(b.name || '');
+
+  //       case 'proteins':
+  //         return (b.proteins || 0) - (a.proteins || 0);
+
+  //       case 'energykcal':
+  //         return (b.energykcal || 0) - (a.energykcal || 0);
+
+  //       case 'rating':
+  //         return (b.rating || 0) - (a.rating || 0);
+
+  //       case 'expirationdate':
+  //         const dateA = a.expirationdate
+  //           ? new Date(a.expirationdate)
+  //           : new Date('9999-12-31');
+  //         const dateB = b.expirationdate
+  //           ? new Date(b.expirationdate)
+  //           : new Date('9999-12-31');
+  //         return dateA.getTime() - dateB.getTime();
+
+  //       case 'allergens':
+  //         const allergenCountA = this.countAllergens(a);
+  //         const allergenCountB = this.countAllergens(b);
+  //         const allergenCompare = allergenCountB - allergenCountA;
+  //         return allergenCompare !== 0
+  //           ? allergenCompare
+  //           : (a.name || '').localeCompare(b.name || '');
+
+  //       case 'allergens_asc':
+  //         const allergenCountA_asc = this.countAllergens(a);
+  //         const allergenCountB_asc = this.countAllergens(b);
+  //         const allergenCompare_asc = allergenCountA_asc - allergenCountB_asc;
+  //         return allergenCompare_asc !== 0
+  //           ? allergenCompare_asc
+  //           : (a.name || '').localeCompare(b.name || '');
+
+  //       default:
+  //         return 0;
+  //     }
+  //   });
+  // }
+
   filterMyPantry() {
     const term = this.searchTerm.toLowerCase().trim();
 
@@ -1057,30 +1162,55 @@ export class Tab4Page {
         food.type,
         food.notes,
         food.unit,
+        food.package_unit,
         food.vegan ? 'vegan' : '',
         food.vegetarian ? 'vegetarian' : '',
         food.halal ? 'halal' : '',
         food.kosher ? 'kosher' : '',
         food.amount ? `amount ${food.amount}` : '',
         food.available ? `available ${food.available}` : '',
+        food.package_size ? `package ${food.package_size}` : '',
 
-        // Updated to use the new nested structure
+        // Updated to use the new nested nutriments structure
         food.nutriments?.['energy-kcal']
           ? `calories ${food.nutriments['energy-kcal']}`
           : '',
+        food.nutriments?.['energy-kcal_100g']
+          ? `calories100g ${food.nutriments['energy-kcal_100g']}`
+          : '',
         food.nutriments?.proteins ? `proteins ${food.nutriments.proteins}` : '',
+        food.nutriments?.proteins_100g
+          ? `proteins100g ${food.nutriments.proteins_100g}`
+          : '',
         food.nutriments?.fat ? `fats ${food.nutriments.fat}` : '',
+        food.nutriments?.fat_100g ? `fats100g ${food.nutriments.fat_100g}` : '',
         food.nutriments?.sugars ? `sugars ${food.nutriments.sugars}` : '',
+        food.nutriments?.sugars_100g
+          ? `sugars100g ${food.nutriments.sugars_100g}`
+          : '',
         food.nutriments?.salt ? `salt ${food.nutriments.salt}` : '',
+        food.nutriments?.salt_100g
+          ? `salt100g ${food.nutriments.salt_100g}`
+          : '',
         food.nutriments?.carbohydrates
           ? `carbohydrates ${food.nutriments.carbohydrates}`
           : '',
+        food.nutriments?.carbohydrates_100g
+          ? `carbohydrates100g ${food.nutriments.carbohydrates_100g}`
+          : '',
+        food.nutriments?.['saturated-fat']
+          ? `saturatedfat ${food.nutriments['saturated-fat']}`
+          : '',
+        food.nutriments?.sodium ? `sodium ${food.nutriments.sodium}` : '',
 
         // Also include allergens in search
         food.allergens ? food.allergens.join(' ') : '',
 
         // Include OpenFoodFacts ID for barcode searches
         food.openfoodfactsid ? food.openfoodfactsid : '',
+
+        // Include environmental data
+        food.footprint_grade ? `footprint ${food.footprint_grade}` : '',
       ]
         .filter(Boolean)
         .join(' ');
@@ -1104,10 +1234,16 @@ export class Tab4Page {
             : (a.name || '').localeCompare(b.name || '');
 
         case 'proteins':
-          return (b.proteins || 0) - (a.proteins || 0);
+          // Updated to use the new nested structure
+          const proteinsA = a.nutriments?.proteins || 0;
+          const proteinsB = b.nutriments?.proteins || 0;
+          return proteinsB - proteinsA;
 
         case 'energykcal':
-          return (b.energykcal || 0) - (a.energykcal || 0);
+          // Updated to use the new nested structure
+          const energyA = a.nutriments?.['energy-kcal'] || 0;
+          const energyB = b.nutriments?.['energy-kcal'] || 0;
+          return energyB - energyA;
 
         case 'rating':
           return (b.rating || 0) - (a.rating || 0);
@@ -1136,6 +1272,18 @@ export class Tab4Page {
           return allergenCompare_asc !== 0
             ? allergenCompare_asc
             : (a.name || '').localeCompare(b.name || '');
+
+        // Additional sorting options for new structure
+        case 'package_size':
+          return (b.package_size || 0) - (a.package_size || 0);
+
+        case 'available':
+          return (b.available || 0) - (a.available || 0);
+
+        case 'footprint':
+          const footprintA = a.footprint_per_kg || 0;
+          const footprintB = b.footprint_per_kg || 0;
+          return footprintA - footprintB; // Lower footprint first
 
         default:
           return 0;

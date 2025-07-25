@@ -614,15 +614,13 @@ export class FirebaseService {
         eatenFoods: eatenFoods,
       });
 
-      await this.loadPantry();
+      // DON'T call loadPantry() here - it resets the cached values
+      // await this.loadPantry();
+
+      console.log('Successfully saved to Firestore:', food);
     } catch (err) {
       console.error('Failed to log eaten food:', err);
     }
-
-    console.log(
-      'Actually saving to Firestore:',
-      eatenFoods[eatenFoods.length - 1]
-    );
   }
 
   async checkIfNickExists(nick: string): Promise<boolean> {

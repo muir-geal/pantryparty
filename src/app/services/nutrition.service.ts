@@ -15,29 +15,20 @@ export class NutritionService {
   }
 
   async logFood(food: EatenFood): Promise<void> {
-    const eatenFood: EatenFood = {
-      ...food,
-      timestamp: Date.now(),
-      package_size:
-        typeof food.package_size === 'number' && food.package_size > 0
-          ? food.package_size
-          : food.amount > 0
-          ? food.amount
-          : 1,
-      package_unit: food.package_unit || food.unit || 'g',
-      amount: food.amount || 1,
-      unit: food.unit || 'g',
-      nutriments: food.nutriments || {},
-      nutrition: food.nutrition || {},
-      notes: food.notes || '',
-      rating: food.rating ?? 0,
-      expirationdate: food.expirationdate || '',
-      type: food.type || '',
-    };
+    // Just add timestamp if it's missing
+    if (!food.timestamp) {
+      food.timestamp = Date.now();
+    }
 
-    console.log('Saving eaten food:', eatenFood);
+    console.log('Saving eaten food:', food);
 
-    await this.firebaseService.logEatenFood(eatenFood);
+    const foodCalories = this.getTotalCalories(food); // Use original food object
+    console.log('Food calories to add:', foodCalories);
+
+    this.eatenToday.push(food);
+    this.consumedToday += foodCalories;
+
+    await this.firebaseService.logEatenFood(food);
   }
 
   setDailyLimit(limit: number): void {

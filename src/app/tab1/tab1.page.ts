@@ -44,7 +44,11 @@ export class Tab1Page {
       return;
     }
     this.firebaseService.pantryId = savedId;
-    await this.firebaseService.loadPantry();
+
+    // Only load if we don't have fresh data
+    if (!this.firebaseService.getPantry()) {
+      await this.firebaseService.loadPantry();
+    }
 
     const pantry = this.firebaseService.getPantry();
     if (!pantry) {
@@ -53,8 +57,10 @@ export class Tab1Page {
       return;
     }
 
-    // Always refresh the data when entering the tab
-    await this.loadCaloriesConsumedToday();
+    // Only refresh calories if we reloaded the pantry
+    if (!this.firebaseService.getPantry()) {
+      await this.loadCaloriesConsumedToday();
+    }
   }
 
   private clearLocalData() {

@@ -31,6 +31,34 @@ export class NutritionService {
     await this.firebaseService.logEatenFood(food);
   }
 
+  async loadTodaysDataFromFirebase() {
+    const pantry = this.firebaseService.getPantry();
+    if (!pantry?.eatenFoods) {
+      this.consumedToday = 0;
+      this.eatenToday = [];
+      return;
+    }
+
+    // Filter and calculate today's data
+    const today = new Date();
+    const startOfDay = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    ).getTime();
+
+    this.eatenToday = pantry.eatenFoods.filter(
+      (food: EatenFood) =>
+        food.timestamp >= startOfDay &&
+        food.timestamp < startOfDay + 24 * 60 * 60 * 1000
+    );
+
+    this.consumedToday = this.eatenToday.reduce(
+      (total, food) => total + this.getTotalCalories(food),
+      0
+    );
+  }
+
   setDailyLimit(limit: number): void {
     this.dailyLimit = limit;
     localStorage.setItem('dailyCalorieLimit', limit.toString());

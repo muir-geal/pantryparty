@@ -57,10 +57,7 @@ export class Tab1Page {
       return;
     }
 
-    // Only refresh calories if we reloaded the pantry
-    if (!this.firebaseService.getPantry()) {
-      await this.loadCaloriesConsumedToday();
-    }
+    await this.nutritionService.loadTodaysDataFromFirebase();
   }
 
   private clearLocalData() {
@@ -74,9 +71,6 @@ export class Tab1Page {
       await this.nutritionService.getCaloriesConsumedToday();
     this.nutritionService.eatenToday =
       await this.nutritionService.getEatenFoodsToday();
-
-    // Force change detection if needed
-    // this.cdr.detectChanges(); // uncomment if you inject ChangeDetectorRef
   }
 
   get caloriesConsumedToday() {

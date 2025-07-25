@@ -3,22 +3,6 @@ import { NutritionService } from '../services/nutrition.service';
 import { EatenFood } from '../models/eaten-food';
 import { FirebaseService } from '../services/firebase.service';
 
-interface DayData {
-  date: Date;
-  dayName: string;
-  calories: number;
-  isToday: boolean;
-}
-
-interface WeekData {
-  weekStart: Date;
-  weekEnd: Date;
-  days: DayData[];
-  totalCalories: number;
-  averageCalories: number;
-  weekNumber: number;
-}
-
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',

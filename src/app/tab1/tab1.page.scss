@@ -96,3 +96,19 @@
   font-weight: normal;
 }
 
+
+//editing eatenfood
+
+.food-actions {
+  display: flex;
+  gap: 4px;
+  
+  ion-button {
+    --padding-start: 8px;
+    --padding-end: 8px;
+    
+    ion-icon {
+      font-size: 18px;
+    }
+  }
+}

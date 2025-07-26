@@ -97,7 +97,17 @@
               </ion-label>
             </ion-item>
 
-            <div class="ion-padding" slot="content" style="font-size: 1.1em">
+            <div class="ion-padding" slot="content" style="font-size: 1.1em; color: #444;">
+               <ion-button
+               expand="block"
+                  fill="clear"
+                  color="dark"
+                  (click)="eatFoodItem(item)"
+                >
+                  <ion-icon
+                    slot="start"
+                    name="restaurant-outline"
+                  ></ion-icon>eat food</ion-button>
               <p>{{ item.package_size }} {{ item.package_unit }}</p>
               <p *ngIf="item.available || item.available != 0">
                 {{ item.available }} {{ item.package_unit }} available for

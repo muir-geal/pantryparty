@@ -5,53 +5,6 @@
 </ion-header>
 
 <ion-content>
-  <!--<div class="progress-arc-container">
-    <svg viewBox="0 0 100 50" class="progress-arc">
-      <path
-        d="M 10 50 A 40 40 0 0 1 90 50"
-        fill="none"
-        stroke="#e0e0e0"
-        stroke-width="10"
-      ></path>
-
-      <path
-        [attr.d]="progressArcPath"
-        fill="none"
-        stroke="#4caf50"
-        stroke-width="10"
-        stroke-linecap="round"
-      ></path>
-    </svg>
-
-    <div class="progress-label">
-      {{ consumedToday }} / {{ dailyLimit }} kcal
-    </div>
-  </div>-->
-
-  <!--<div class="progress-container">
-    <svg viewBox="0 0 36 36" class="circular-chart">
-      <path
-        class="circle-bg"
-        d="M18 2.0845
-             a 15.9155 15.9155 0 0 1 0 31.831
-             a 15.9155 15.9155 0 0 1 0 -31.831"
-      />
-      <path
-        class="circle"
-        [attr.stroke-dasharray]="progress + ', 100'"
-        d="M18 2.0845
-             a 15.9155 15.9155 0 0 1 0 31.831
-             a 15.9155 15.9155 0 0 1 0 -31.831"
-      />
-      <text x="18" y="20.35" class="percentage">
-        {{ consumedToday }} / {{ dailyLimit }} kcal
-      </text>
-    </svg>
-    <div class="progress-label">
-      {{ consumedToday }} / {{ dailyLimit }} kcal
-    </div>
-  </div>-->
-
   <div class="progress-container">
     <svg viewBox="0 0 36 36" class="circular-chart">
       <circle class="circle-bg" cx="18" cy="18" r="15.9155" />
@@ -86,21 +39,42 @@
     </div>
   </ion-card>
 
-  <ion-card>
-    <ion-accordion-group>
-      <ion-accordion value="eaten-today">
-        <ion-item slot="header" color="light">
-          <ion-label>Eaten Today</ion-label>
+<!-- Replace the eaten today accordion section with this -->
+<ion-card>
+  <ion-accordion-group>
+    <ion-accordion value="eaten-today">
+      <ion-item slot="header" color="light">
+        <ion-label>Eaten Today</ion-label>
+      </ion-item>
+      <ion-list slot="content">
+        <ion-item *ngFor="let item of eatenToday">
+          <ion-label>
+            <h3>{{ item.name }}</h3>
+            <p>{{ getTotalCalories(item) }} kcal</p>
+          </ion-label>
+          
+          <!-- Edit and Delete buttons -->
+          <div slot="end" class="food-actions">
+            <ion-button
+              fill="clear"
+              color="primary"
+              size="small"
+              (click)="editFoodItem(item)"
+            >
+              <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
+            </ion-button>
+            <ion-button
+              fill="clear"
+              color="danger"
+              size="small"
+              (click)="deleteFoodItem(item)"
+            >
+              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+            </ion-button>
+          </div>
         </ion-item>
-        <ion-list slot="content">
-          <ion-item *ngFor="let item of eatenToday">
-            <ion-label>
-              <h3>{{ item.name }}</h3>
-              <p>{{ getTotalCalories(item) }} kcal</p>
-            </ion-label>
-          </ion-item>
-        </ion-list>
-      </ion-accordion>
-    </ion-accordion-group>
-  </ion-card>
+      </ion-list>
+    </ion-accordion>
+  </ion-accordion-group>
+</ion-card>
 </ion-content>

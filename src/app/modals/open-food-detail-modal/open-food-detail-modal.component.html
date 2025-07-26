@@ -102,19 +102,6 @@
       </div>
     </div>
 
-    <!--<div *ngIf="getNutrientList(food).length > 0" class="nutrient-legend">
-      <div
-        class="legend-item"
-        *ngFor="let nutrient of getNutrientList(food)"
-        [class.calorie-item]="nutrient.isCalorie"
-      >
-        <span class="legend-name">{{ nutrient.name }}</span>
-        <span class="legend-value">
-          {{ nutrient.value | number : "1.0-0" }}{{ nutrient.unit }}
-        </span>
-      </div>
-    </div>-->
-
     <div
       *ngIf="countAllergens(food) >= 0"
       style="

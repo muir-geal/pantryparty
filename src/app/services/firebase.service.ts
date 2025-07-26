@@ -633,4 +633,87 @@ export class FirebaseService {
       return false;
     }
   }
+
+
+/////////// TYPED IN SALZBERGEN ///////////
+
+async updateEatenFood(originalItem: EatenFood, updatedItem: EatenFood): Promise<void> {
+  if (!this.pantryId) return;
+
+  const pantryRef = doc(this.itemCollection, this.pantryId);
+  const pantrySnap = await getDoc(pantryRef);
+
+  if (!pantrySnap.exists()) {
+    console.error('Pantry not found');
+    return;
+  }
+
+  const pantryData = pantrySnap.data();
+  const eatenFoods = Array.isArray(pantryData?.['eatenFoods'])
+    ? [...pantryData['eatenFoods']]
+    : [];
+
+  // Find and update the item
+  const index = eatenFoods.findIndex(food => 
+    food.timestamp === originalItem.timestamp && 
+    food.name === originalItem.name
+  );
+
+  if (index !== -1) {
+    eatenFoods[index] = updatedItem;
+
+    try {
+      await updateDoc(pantryRef, {
+        eatenFoods: eatenFoods,
+      });
+      console.log('Successfully updated eaten food in Firestore');
+    } catch (err) {
+      console.error('Failed to update eaten food:', err);
+      throw err;
+    }
+  } else {
+    throw new Error('Food item not found in database');
+  }
+}
+
+async deleteEatenFood(item: EatenFood): Promise<void> {
+  if (!this.pantryId) return;
+
+  const pantryRef = doc(this.itemCollection, this.pantryId);
+  const pantrySnap = await getDoc(pantryRef);
+
+  if (!pantrySnap.exists()) {
+    console.error('Pantry not found');
+    return;
+  }
+
+  const pantryData = pantrySnap.data();
+  const eatenFoods = Array.isArray(pantryData?.['eatenFoods'])
+    ? [...pantryData['eatenFoods']]
+    : [];
+
+  // Find and remove the item
+  const index = eatenFoods.findIndex(food => 
+    food.timestamp === item.timestamp && 
+    food.name === item.name
+  );
+
+  if (index !== -1) {
+    eatenFoods.splice(index, 1);
+
+    try {
+      await updateDoc(pantryRef, {
+        eatenFoods: eatenFoods,
+      });
+      console.log('Successfully deleted eaten food from Firestore');
+    } catch (err) {
+      console.error('Failed to delete eaten food:', err);
+      throw err;
+    }
+  } else {
+    throw new Error('Food item not found in database');
+  }
+}
+/////////// TYPED IN SALZBERGEN ///////////
+
 }

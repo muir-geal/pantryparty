@@ -521,4 +521,73 @@ export class NutritionService {
       return 0;
     }
   }
+
+
+  /////////// TYPED IN SALZBERGEN ///////////
+  async updateEatenFood(originalItem: EatenFood, updatedItem: EatenFood): Promise<void> {
+  try {
+    // Update in Firebase
+    await this.firebaseService.updateEatenFood(originalItem, updatedItem);
+
+    // Update local cache
+    const index = this.eatenToday.findIndex(food => 
+      food.timestamp === originalItem.timestamp && 
+      food.name === originalItem.name
+    );
+    
+    if (index !== -1) {
+      // Calculate calorie difference
+      const oldCalories = this.getTotalCalories(originalItem);
+      const newCalories = this.getTotalCalories(updatedItem);
+      const calorieDifference = newCalories - oldCalories;
+
+      // Update the item in cache
+      this.eatenToday[index] = updatedItem;
+      
+      // Update total consumed calories
+      this.consumedToday += calorieDifference;
+    }
+
+    console.log('Food item updated successfully');
+  } catch (error) {
+    console.error('Error updating eaten food:', error);
+    throw error;
+  }
+}
+
+async deleteEatenFood(item: EatenFood): Promise<void> {
+  try {
+    // Delete from Firebase
+    await this.firebaseService.deleteEatenFood(item);
+
+    // Update local cache
+    const index = this.eatenToday.findIndex(food => 
+      food.timestamp === item.timestamp && 
+      food.name === item.name
+    );
+    
+    if (index !== -1) {
+      // Calculate calories to subtract
+      const calories = this.getTotalCalories(item);
+      
+      // Remove from cache
+      this.eatenToday.splice(index, 1);
+      
+      // Update total consumed calories
+      this.consumedToday -= calories;
+      
+      // Ensure it doesn't go below 0
+      if (this.consumedToday < 0) {
+        this.consumedToday = 0;
+      }
+    }
+
+    console.log('Food item deleted successfully');
+  } catch (error) {
+    console.error('Error deleting eaten food:', error);
+    throw error;
+  }
+}
+/////////// TYPED IN SALZBERGEN ///////////
+
 }
